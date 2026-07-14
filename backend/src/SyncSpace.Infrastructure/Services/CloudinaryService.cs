@@ -18,7 +18,7 @@ public class CloudinaryService : ICloudinaryService
 
         var account = new Account(cloudName, apiKey, apiSecret);
         _cloudinary = new Cloudinary(account);
-        _workspaceFolder = "syncspace";
+        _workspaceFolder = configuration["Cloudinary:Folder"] ?? "SyncSpace";
     }
 
     public async Task<CloudinaryUploadResult> UploadFileAsync(Stream fileStream, string filename, string folder, CancellationToken ct = default)
