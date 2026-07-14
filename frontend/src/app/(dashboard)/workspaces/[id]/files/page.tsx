@@ -1,27 +1,36 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 import { useDriveStore } from "@/features/drive/stores/driveStore";
+import { useWorkspaceStore } from "@/features/workspace/stores/workspaceStore";
 import FileUpload from "@/features/drive/components/FileUpload";
 import FileBrowser from "@/features/drive/components/FileBrowser";
 import FilePreviewModal from "@/features/drive/components/FilePreviewModal";
 import StorageStats from "@/features/drive/components/StorageStats";
-import { FolderPlus, Plus, Trash2, ArrowLeft } from "lucide-react";
+import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import { FolderPlus, Plus, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
 
 export default function FilesPage() {
+  const router = useRouter();
   const params = useParams();
   const workspaceId = params.id as string;
+  const { currentWorkspace, fetchWorkspace } = useWorkspaceStore();
   const {
     folders, currentPath, isLoading, fetchFiles, fetchFolders, fetchStats,
     setPath, createFolder
   } = useDriveStore();
   const [showUpload, setShowUpload] = useState(false);
-  const [showTrash, setShowTrash] = useState(false);
   const [newFolderName, setNewFolderName] = useState("");
   const [showNewFolder, setShowNewFolder] = useState(false);
+
+  useEffect(() => {
+    fetchWorkspace(workspaceId);
+  }, [workspaceId, fetchWorkspace]);
 
   useEffect(() => {
     fetchFiles(workspaceId);
@@ -38,76 +47,101 @@ export default function FilesPage() {
   };
 
   return (
-    <div className="min-h-full bg-[#0D0D14] p-4 sm:p-6">
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-xl font-semibold text-zinc-200">Files</h1>
-            <p className="text-xs text-zinc-500 mt-0.5">Manage your workspace files and documents</p>
-          </div>
-          <div className="flex items-center gap-2 flex-wrap">
-            {currentPath !== "/" && (
-              <Button variant="ghost" size="sm" onClick={() => {
-                const parts = currentPath.split("/").filter(Boolean);
-                setPath(parts.length > 1 ? `/${parts.slice(0, -1).join("/")}/` : "/");
-              }} className="text-zinc-400">
-                <ArrowLeft className="w-3.5 h-3.5 mr-1" /> Back
+    <DashboardLayout>
+      <div className="max-w-7xl mx-auto space-y-6">
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Button
+            variant="ghost"
+            onClick={() => router.push(`/workspaces/${workspaceId}`)}
+            className="mb-4 gap-2"
+          >
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </Button>
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-cyan-500/20 to-cyan-500/5">
+                <FolderPlus className="h-5 w-5 text-cyan-400" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight">Files</h1>
+                <p className="text-sm text-muted-foreground">
+                  {currentWorkspace?.name} &middot; Manage workspace files
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {currentPath !== "/" && (
+                <Button variant="ghost" size="sm" onClick={() => {
+                  const parts = currentPath.split("/").filter(Boolean);
+                  setPath(parts.length > 1 ? `/${parts.slice(0, -1).join("/")}/` : "/");
+                }} className="gap-1">
+                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                </Button>
+              )}
+              <Button variant="ghost" size="sm" onClick={() => setShowNewFolder(!showNewFolder)} className="gap-1">
+                <FolderPlus className="h-3.5 w-3.5" /> New folder
               </Button>
-            )}
-            <Button variant="ghost" size="sm" onClick={() => setShowNewFolder(!showNewFolder)} className="text-zinc-400">
-              <FolderPlus className="w-3.5 h-3.5 mr-1" /> New folder
-            </Button>
-            <Button size="sm" onClick={() => setShowUpload(!showUpload)} className="bg-[#6366F1] hover:bg-[#5558E6]">
-              <Plus className="w-3.5 h-3.5 mr-1" /> Upload
-            </Button>
+              <Button size="sm" onClick={() => setShowUpload(!showUpload)} className="gap-1">
+                <Plus className="h-3.5 w-3.5" /> Upload
+              </Button>
+            </div>
           </div>
-        </div>
+        </motion.div>
 
-        {/* New folder input */}
         {showNewFolder && (
-          <div className="flex gap-2 mb-4">
-            <Input
-              value={newFolderName}
-              onChange={(e) => setNewFolderName(e.target.value)}
-              placeholder="Folder name"
-              className="h-8 text-xs bg-white/5 border-white/10 max-w-xs"
-              onKeyDown={(e) => e.key === "Enter" && handleCreateFolder()}
-              autoFocus
-            />
-            <Button size="sm" onClick={handleCreateFolder} className="h-8 bg-[#6366F1] hover:bg-[#5558E6]">Create</Button>
-            <Button size="sm" variant="ghost" onClick={() => setShowNewFolder(false)} className="h-8 text-zinc-400">Cancel</Button>
-          </div>
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+          >
+            <Card>
+              <CardContent className="p-4">
+                <div className="flex gap-2">
+                  <Input
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                    placeholder="Folder name"
+                    className="h-9 text-sm max-w-xs"
+                    onKeyDown={(e) => e.key === "Enter" && handleCreateFolder()}
+                    autoFocus
+                  />
+                  <Button size="sm" onClick={handleCreateFolder} className="h-9">Create</Button>
+                  <Button size="sm" variant="ghost" onClick={() => setShowNewFolder(false)} className="h-9">Cancel</Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         )}
 
-        {/* Upload */}
         {showUpload && (
-          <div className="mb-6">
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+          >
             <FileUpload workspaceId={workspaceId} folderPath={currentPath} />
-          </div>
+          </motion.div>
         )}
 
         <div className="flex gap-6">
-          {/* Main content */}
           <div className="flex-1 min-w-0">
             {isLoading ? (
               <div className="flex items-center justify-center py-16">
-                <div className="w-8 h-8 border-2 border-[#6366F1] border-t-transparent rounded-full animate-spin" />
+                <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
               </div>
             ) : (
               <FileBrowser workspaceId={workspaceId} />
             )}
           </div>
-
-          {/* Sidebar stats */}
           <div className="w-64 shrink-0 hidden lg:block">
             <StorageStats />
           </div>
         </div>
       </div>
 
-      {/* Preview Modal */}
       <FilePreviewModal />
-    </div>
+    </DashboardLayout>
   );
 }

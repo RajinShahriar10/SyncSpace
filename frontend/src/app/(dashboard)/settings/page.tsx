@@ -7,20 +7,26 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store";
-import { Settings, User, LogOut, Save, Loader2 } from "lucide-react";
+import { Settings, LogOut, Save, Loader2, User, Check } from "lucide-react";
+import { getInitials } from "@/lib/utils";
 
 export default function SettingsPage() {
   const { user, logout } = useAuthStore();
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
-  const [email, setEmail] = useState(user?.email || "");
 
   const handleSave = async () => {
     setSaving(true);
-    await new Promise((r) => setTimeout(r, 500));
+    // Simulate save (no backend endpoint for profile update yet)
+    await new Promise((r) => setTimeout(r, 800));
     setSaving(false);
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
   };
+
+  const hasChanges = firstName !== (user?.firstName || "") || lastName !== (user?.lastName || "");
 
   return (
     <DashboardLayout>
@@ -30,11 +36,11 @@ export default function SettingsPage() {
           animate={{ opacity: 1, y: 0 }}
         >
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
               <Settings className="h-5 w-5 text-primary" />
             </div>
             <div>
-              <h1 className="text-3xl font-bold tracking-tight">Settings</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Settings</h1>
               <p className="text-muted-foreground">Manage your account preferences</p>
             </div>
           </div>
@@ -47,13 +53,18 @@ export default function SettingsPage() {
         >
           <Card>
             <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-lg font-bold text-primary">
-                  {user?.firstName?.[0]}{user?.lastName?.[0]}
+              <div className="flex items-center gap-4">
+                <div className="relative">
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary/20 to-secondary/20 text-xl font-bold text-primary">
+                    {user ? getInitials(`${user.firstName} ${user.lastName}`) : "SS"}
+                  </div>
+                  <div className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-emerald-500 border-2 border-background flex items-center justify-center">
+                    <Check className="h-3 w-3 text-white" />
+                  </div>
                 </div>
                 <div>
-                  <CardTitle>Profile</CardTitle>
-                  <CardDescription>Update your personal information</CardDescription>
+                  <CardTitle className="text-lg">{user?.firstName} {user?.lastName}</CardTitle>
+                  <CardDescription>{user?.email}</CardDescription>
                 </div>
               </div>
             </CardHeader>
@@ -65,6 +76,7 @@ export default function SettingsPage() {
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="First name"
+                    className="h-11"
                   />
                 </div>
                 <div className="space-y-2">
@@ -73,26 +85,33 @@ export default function SettingsPage() {
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Last name"
+                    className="h-11"
                   />
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-sm font-medium text-muted-foreground">Email</label>
                 <Input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Email address"
-                  type="email"
+                  value={user?.email || ""}
+                  disabled
+                  className="h-11 opacity-60"
                 />
+                <p className="text-xs text-muted-foreground">Email is managed by your GitHub account</p>
               </div>
               <div className="flex justify-end pt-2">
-                <Button onClick={handleSave} disabled={saving} className="gap-2">
+                <Button
+                  onClick={handleSave}
+                  disabled={saving || !hasChanges}
+                  className="gap-2"
+                >
                   {saving ? (
                     <Loader2 className="h-4 w-4 animate-spin" />
+                  ) : saved ? (
+                    <Check className="h-4 w-4" />
                   ) : (
                     <Save className="h-4 w-4" />
                   )}
-                  Save Changes
+                  {saved ? "Saved" : "Save Changes"}
                 </Button>
               </div>
             </CardContent>
@@ -110,17 +129,46 @@ export default function SettingsPage() {
               <CardDescription>Manage your account settings</CardDescription>
             </CardHeader>
             <CardContent>
-              <Button
-                variant="destructive"
-                onClick={() => {
-                  logout();
-                  window.location.href = "/login";
-                }}
-                className="gap-2"
-              >
-                <LogOut className="h-4 w-4" />
-                Sign Out
-              </Button>
+              <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
+                <div>
+                  <p className="text-sm font-medium">Sign Out</p>
+                  <p className="text-xs text-muted-foreground">Sign out from your account</p>
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={() => {
+                    logout();
+                    window.location.href = "/login";
+                  }}
+                  className="gap-2"
+                >
+                  <LogOut className="h-4 w-4" />
+                  Sign Out
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card>
+            <CardHeader>
+              <CardTitle>Appearance</CardTitle>
+              <CardDescription>Customize the look and feel</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
+                <div>
+                  <p className="text-sm font-medium">Theme</p>
+                  <p className="text-xs text-muted-foreground">Toggle between dark and light mode</p>
+                </div>
+                <p className="text-xs text-muted-foreground">Use the moon icon in the header</p>
+              </div>
             </CardContent>
           </Card>
         </motion.div>

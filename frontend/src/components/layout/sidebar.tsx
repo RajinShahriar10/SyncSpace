@@ -4,34 +4,44 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import {
-  LayoutDashboard,
-  FileText,
-  KanbanSquare,
-  MessageSquare,
-  Settings,
-  Bell,
-  Users,
-  ChevronLeft,
-  Plus,
-  Activity,
-  BarChart3,
-  Shield,
+  LayoutDashboard, FileText, KanbanSquare, MessageSquare,
+  Settings, Bell, Users, ChevronLeft, Plus, Activity, BarChart3, Shield,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { useUIStore } from "@/store";
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "Workspaces", href: "/workspaces", icon: Users },
-  { name: "Documents", href: "/documents", icon: FileText },
-  { name: "Boards", href: "/boards", icon: KanbanSquare },
-  { name: "Messages", href: "/messages", icon: MessageSquare },
-  { name: "Notifications", href: "/notifications", icon: Bell },
-  { name: "Activity", href: "/activity", icon: Activity },
-  { name: "Analytics", href: "/analytics", icon: BarChart3 },
-  { name: "Admin", href: "/admin", icon: Shield },
-  { name: "Settings", href: "/settings", icon: Settings },
+const sections = [
+  {
+    label: "Main",
+    items: [
+      { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+      { name: "Workspaces", href: "/workspaces", icon: Users },
+    ],
+  },
+  {
+    label: "Content",
+    items: [
+      { name: "Documents", href: "/documents", icon: FileText },
+      { name: "Boards", href: "/boards", icon: KanbanSquare },
+      { name: "Messages", href: "/messages", icon: MessageSquare },
+    ],
+  },
+  {
+    label: "Insights",
+    items: [
+      { name: "Activity", href: "/activity", icon: Activity },
+      { name: "Analytics", href: "/analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    label: "Account",
+    items: [
+      { name: "Notifications", href: "/notifications", icon: Bell },
+      { name: "Admin", href: "/admin", icon: Shield },
+      { name: "Settings", href: "/settings", icon: Settings },
+    ],
+  },
 ];
 
 export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
@@ -62,48 +72,64 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         </Button>
       </div>
 
-      <div className="flex-1 space-y-1 px-3 py-2 overflow-y-auto">
-        {navigation.map((item) => {
-          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
-          return (
-            <Link key={item.name} href={item.href} onClick={onNavigate}>
-              <motion.div
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className={cn(
-                  "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200",
-                  isActive
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-                )}
-              >
-                <item.icon className="h-5 w-5 shrink-0" />
-                {sidebarOpen && (
-                  <motion.span
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    className="truncate"
-                  >
-                    {item.name}
-                  </motion.span>
-                )}
-                {isActive && (
-                  <motion.div
-                    layoutId="sidebar-active"
-                    className="absolute left-0 h-6 w-1 rounded-r-full bg-primary"
-                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
-                  />
-                )}
-              </motion.div>
-            </Link>
-          );
-        })}
+      <div className="flex-1 space-y-4 px-3 py-2 overflow-y-auto">
+        {sections.map((section) => (
+          <div key={section.label}>
+            {sidebarOpen && (
+              <p className="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground/50">
+                {section.label}
+              </p>
+            )}
+            <div className="space-y-0.5">
+              {section.items.map((item) => {
+                const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+                return (
+                  <Link key={item.name} href={item.href} onClick={onNavigate}>
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={cn(
+                        "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
+                        isActive
+                          ? "bg-primary/10 text-primary"
+                          : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                      )}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="sidebar-active"
+                          className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-primary"
+                          transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                        />
+                      )}
+                      <item.icon className={cn(
+                        "h-5 w-5 shrink-0 transition-colors",
+                        isActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
+                      )} />
+                      {sidebarOpen && (
+                        <motion.span
+                          initial={{ opacity: 0 }}
+                          animate={{ opacity: 1 }}
+                          className="truncate"
+                        >
+                          {item.name}
+                        </motion.span>
+                      )}
+                    </motion.div>
+                  </Link>
+                );
+              })}
+            </div>
+          </div>
+        ))}
       </div>
 
       <div className="border-t border-white/10 p-3">
-        <Button variant="glass" className="w-full justify-start gap-3">
-          <Plus className="h-5 w-5 shrink-0" />
-          {sidebarOpen && <span>New Workspace</span>}
+        <Button variant="glass" className="w-full justify-start gap-3" asChild>
+          <Link href="/workspaces" onClick={onNavigate}>
+            <Plus className="h-5 w-5 shrink-0" />
+            {sidebarOpen && <span>New Workspace</span>}
+          </Link>
         </Button>
       </div>
     </motion.aside>
