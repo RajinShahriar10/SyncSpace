@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SyncSpace.API/SyncSpace.API.csproj" />
+    <Project Path="src/SyncSpace.Application/SyncSpace.Application.csproj" />
+    <Project Path="src/SyncSpace.Domain/SyncSpace.Domain.csproj" />
+    <Project Path="src/SyncSpace.Infrastructure/SyncSpace.Infrastructure.csproj" />
+    <Project Path="src/SyncSpace.Persistence/SyncSpace.Persistence.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SyncSpace.Application.UnitTests/SyncSpace.Application.UnitTests.csproj" />
+    <Project Path="tests/SyncSpace.Domain.UnitTests/SyncSpace.Domain.UnitTests.csproj" />
+    <Project Path="tests/SyncSpace.Infrastructure.IntegrationTests/SyncSpace.Infrastructure.IntegrationTests.csproj" />
+  </Folder>
+</Solution>

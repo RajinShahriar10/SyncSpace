@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  api:
+    build:
+      context: ../backend
+      dockerfile: ../docker/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Host=database;Port=5432;Database=syncspace;Username=postgres;Password=postgres
+      - Jwt__Key=DevSecretKey1234567890123456789012!!
+      - Jwt__Issuer=SyncSpace
+      - Jwt__Audience=SyncSpace
+    depends_on:
+      - database
+      - redis
+    networks:
+      - syncspace-net
+
+  frontend:
+    build:
+      context: ../frontend
+      dockerfile: ../docker/Dockerfile.frontend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:5000/api
+      - NEXT_PUBLIC_WS_URL=http://localhost:5000/hubs
+    depends_on:
+      - api
+    networks:
+      - syncspace-net
+
+  database:
+    image: postgres:16-alpine
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: syncspace
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - syncspace-net
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    networks:
+      - syncspace-net
+
+volumes:
+  postgres_data:
+
+networks:
+  syncspace-net:
+    driver: bridge
