@@ -6,18 +6,8 @@ const publicPaths = ["/", "/login", "/register", "/auth/callback"];
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  const isPublic = publicPaths.some(
-    (p) => pathname === p || pathname.startsWith("/api/")
-  );
-
-  if (isPublic) {
+  if (publicPaths.some((p) => pathname === p) || pathname.startsWith("/api/")) {
     return NextResponse.next();
-  }
-
-  const accessToken = request.cookies.get("access_token")?.value;
-
-  if (!accessToken && pathname.startsWith("/workspaces")) {
-    return NextResponse.redirect(new URL("/login", request.url));
   }
 
   return NextResponse.next();
