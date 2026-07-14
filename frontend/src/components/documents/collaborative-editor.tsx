@@ -41,7 +41,6 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
   const router = useRouter();
   const {
     currentDocument,
-    fetchDocument,
     updateDocument,
     onlineUsers,
     setOnlineUsers,
@@ -67,12 +66,11 @@ export function CollaborativeEditor({ documentId }: { documentId: string }) {
   const editorRef = useRef<HTMLTextAreaElement>(null);
   const titleRef = useRef<HTMLInputElement>(null);
 
-  // Load document
+  // Load versions and comments (document already fetched by parent page)
   useEffect(() => {
-    fetchDocument(documentId);
     fetchVersions(documentId);
     fetchComments(documentId);
-  }, [documentId, fetchDocument, fetchVersions, fetchComments]);
+  }, [documentId, fetchVersions, fetchComments]);
 
   // Sync local state when document loads
   useEffect(() => {
