@@ -1,3 +1,5 @@
+using System.Net.Http.Json;
+using System.Text.Json;
 using Microsoft.Extensions.Configuration;
 using SyncSpace.Application.Common.Interfaces;
 
@@ -5,40 +7,43 @@ namespace SyncSpace.Infrastructure.Identity;
 
 public class GoogleAuthService : IGoogleAuthService
 {
+    private readonly HttpClient _httpClient;
     private readonly IConfiguration _configuration;
 
-    public GoogleAuthService(IConfiguration configuration)
+    public GoogleAuthService(HttpClient httpClient, IConfiguration configuration)
     {
+        _httpClient = httpClient;
         _configuration = configuration;
     }
 
-    public async Task<GoogleUserInfo?> ValidateTokenAsync(string idToken)
+    public async Task<ExternalUserInfo?> ValidateTokenAsync(string idToken)
     {
         try
         {
-            // In production, use Google.Apis.Auth:
-            // var payload = await GoogleJsonWebSignature.ValidateAsync(idToken,
-            //     new GoogleJsonWebSignature.ValidationSettings
-            //     {
-            //         Audience = new[] { _configuration["Google:ClientId"] }
-            //     });
-            //
-            // return new GoogleUserInfo
-            // {
-            //     Email = payload.Email,
-            //     FirstName = payload.GivenName,
-            //     LastName = payload.FamilyName,
-            //     Picture = payload.Picture
-            // };
+            var clientId = _configuration["Google:ClientId"];
+            if (string.IsNullOrEmpty(clientId))
+                return null;
 
-            // Stub for development
-            await Task.CompletedTask;
-            return new GoogleUserInfo
+            var response = await _httpClient.GetFromJsonAsync<JsonElement>(
+                $"https://oauth2.googleapis.com/tokeninfo?id_token={idToken}");
+
+            var email = response.GetProperty("email").GetString();
+            var emailVerified = response.GetProperty("email_verified").GetBoolean();
+
+            if (string.IsNullOrEmpty(email) || !emailVerified)
+                return null;
+
+            var audience = response.GetProperty("aud").GetString();
+            if (audience != clientId)
+                return null;
+
+            return new ExternalUserInfo
             {
-                Email = "user@gmail.com",
-                FirstName = "Google",
-                LastName = "User",
-                Picture = null
+                Email = email,
+                FirstName = response.TryGetProperty("given_name", out var gn) ? gn.GetString() ?? "" : "",
+                LastName = response.TryGetProperty("family_name", out var fn) ? fn.GetString() ?? "" : "",
+                Picture = response.TryGetProperty("picture", out var pic) ? pic.GetString() : null,
+                ExternalId = response.TryGetProperty("sub", out var sub) ? sub.GetString() : null
             };
         }
         catch

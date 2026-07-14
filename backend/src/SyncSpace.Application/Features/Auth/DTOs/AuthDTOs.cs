@@ -30,6 +30,11 @@ public record GoogleLoginCommand : IRequest<ApiResponse<AuthResponse>>
     public string IdToken { get; init; } = string.Empty;
 }
 
+public record GithubLoginCommand : IRequest<ApiResponse<AuthResponse>>
+{
+    public string AccessToken { get; init; } = string.Empty;
+}
+
 public record RevokeTokenCommand : IRequest<ApiResponse<bool>>
 {
     public string RefreshToken { get; init; } = string.Empty;

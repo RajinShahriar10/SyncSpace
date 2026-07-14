@@ -91,7 +91,8 @@ public static class DependencyInjection
         services.AddScoped<IIdentityService, IdentityService>();
         services.AddScoped<IRefreshTokenService, RefreshTokenService>();
         services.AddScoped<ICurrentUserService, CurrentUserService>();
-        services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+        services.AddHttpClient<IGoogleAuthService, GoogleAuthService>();
+        services.AddHttpClient<IGithubAuthService, GithubAuthService>();
         services.AddScoped<SyncSpace.Application.Common.Interfaces.ICloudinaryService, SyncSpace.Infrastructure.Services.CloudinaryService>();
         services.AddScoped<SyncSpace.Application.Common.Interfaces.INotificationService, SyncSpace.Infrastructure.Services.NotificationService>();
         services.AddScoped<SyncSpace.Application.Common.Interfaces.ISearchService, SyncSpace.Infrastructure.Services.SearchService>();

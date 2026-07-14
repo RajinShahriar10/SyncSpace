@@ -87,6 +87,24 @@ public class AuthController : ControllerBase
         return result.Success ? Ok(result) : Unauthorized(result);
     }
 
+    [HttpPost("github")]
+    [EnableRateLimiting("auth")]
+    [ProducesResponseType(typeof(ApiResponse<AuthResponse>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(ApiResponse<AuthResponse>), StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GithubLogin([FromBody] GithubLoginCommand command)
+    {
+        var result = await _mediator.Send(command);
+        if (result.Success && result.Data != null)
+        {
+            await _auditService.LogAsync(
+                result.Data.User.Id, AuditAction.UserLogin, "User", result.Data.User.Id, null,
+                "GitHub login: " + result.Data.User.Email,
+                ipAddress: HttpContext.Connection.RemoteIpAddress?.ToString(),
+                userAgent: HttpContext.Request.Headers.UserAgent.ToString());
+        }
+        return result.Success ? Ok(result) : Unauthorized(result);
+    }
+
     [Authorize]
     [HttpPost("revoke")]
     [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]

@@ -62,15 +62,21 @@ public interface IRefreshTokenService
 
 public interface IGoogleAuthService
 {
-    Task<GoogleUserInfo?> ValidateTokenAsync(string idToken);
+    Task<ExternalUserInfo?> ValidateTokenAsync(string idToken);
 }
 
-public class GoogleUserInfo
+public interface IGithubAuthService
+{
+    Task<ExternalUserInfo?> GetUserInfoAsync(string accessToken);
+}
+
+public class ExternalUserInfo
 {
     public string Email { get; set; } = string.Empty;
     public string FirstName { get; set; } = string.Empty;
     public string LastName { get; set; } = string.Empty;
     public string? Picture { get; set; }
+    public string? ExternalId { get; set; }
 }
 
 public interface ICloudinaryService

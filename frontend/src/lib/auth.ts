@@ -35,6 +35,10 @@ export interface GoogleLoginRequest {
   idToken: string;
 }
 
+export interface GithubLoginRequest {
+  accessToken: string;
+}
+
 export async function login(data: LoginRequest): Promise<AuthResponse> {
   const response = await api.post<AuthResponse>("/auth/login", data);
   return response.data;
@@ -47,6 +51,11 @@ export async function register(data: RegisterRequest): Promise<AuthResponse> {
 
 export async function googleLogin(data: GoogleLoginRequest): Promise<AuthResponse> {
   const response = await api.post<AuthResponse>("/auth/google", data);
+  return response.data;
+}
+
+export async function githubLogin(data: GithubLoginRequest): Promise<AuthResponse> {
+  const response = await api.post<AuthResponse>("/auth/github", data);
   return response.data;
 }
 
