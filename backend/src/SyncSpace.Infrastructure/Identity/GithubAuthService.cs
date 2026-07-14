@@ -2,6 +2,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using SyncSpace.Application.Common.Interfaces;
 
 namespace SyncSpace.Infrastructure.Identity;
@@ -11,10 +12,12 @@ public class GithubAuthService : IGithubAuthService
     private readonly HttpClient _httpClient;
     private readonly string _clientId;
     private readonly string _clientSecret;
+    private readonly ILogger<GithubAuthService> _logger;
 
-    public GithubAuthService(HttpClient httpClient, IConfiguration configuration)
+    public GithubAuthService(HttpClient httpClient, IConfiguration configuration, ILogger<GithubAuthService> logger)
     {
         _httpClient = httpClient;
+        _logger = logger;
         _clientId = Environment.GetEnvironmentVariable("GITHUB_CLIENT_ID")
             ?? configuration["GitHub:ClientId"]
             ?? "";
@@ -27,32 +30,63 @@ public class GithubAuthService : IGithubAuthService
     {
         try
         {
-            var tokenResponse = await _httpClient.PostAsJsonAsync(
-                "https://github.com/login/oauth/access_token",
-                new
+            _logger.LogInformation("GitHub OAuth: exchanging code for token. ClientId present: {HasId}, ClientSecret present: {HasSecret}",
+                !string.IsNullOrEmpty(_clientId), !string.IsNullOrEmpty(_clientSecret));
+
+            var tokenRequest = new HttpRequestMessage(HttpMethod.Post, "https://github.com/login/oauth/access_token")
+            {
+                Content = JsonContent.Create(new
                 {
                     client_id = _clientId,
                     client_secret = _clientSecret,
                     code
-                });
+                }, options: new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase })
+            };
+            tokenRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            tokenRequest.Headers.UserAgent.Add(new ProductInfoHeaderValue("SyncSpace", "1.0"));
 
+            var tokenResponse = await _httpClient.SendAsync(tokenRequest);
             var tokenContent = await tokenResponse.Content.ReadAsStringAsync();
+
+            _logger.LogInformation("GitHub token response status: {Status}", tokenResponse.StatusCode);
+
+            if (!tokenResponse.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("GitHub token exchange failed: {Content}", tokenContent);
+                return null;
+            }
+
             var tokenDoc = JsonSerializer.Deserialize<Dictionary<string, JsonElement>>(tokenContent);
 
             if (tokenDoc == null || !tokenDoc.TryGetValue("access_token", out var accessTokenElement))
+            {
+                _logger.LogWarning("No access_token in GitHub response: {Content}", tokenContent);
                 return null;
+            }
 
             var accessToken = accessTokenElement.GetString();
             if (string.IsNullOrEmpty(accessToken))
+            {
+                _logger.LogWarning("GitHub access_token is empty");
                 return null;
+            }
 
-            var request = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
-            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
-            request.Headers.UserAgent.Add(new ProductInfoHeaderValue("SyncSpace", "1.0"));
-            request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            var userRequest = new HttpRequestMessage(HttpMethod.Get, "https://api.github.com/user");
+            userRequest.Headers.Authorization = new AuthenticationHeaderValue("Bearer", accessToken);
+            userRequest.Headers.UserAgent.Add(new ProductInfoHeaderValue("SyncSpace", "1.0"));
+            userRequest.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-            var userResponse = await _httpClient.SendAsync(request);
+            var userResponse = await _httpClient.SendAsync(userRequest);
             var userJson = await userResponse.Content.ReadAsStringAsync();
+
+            _logger.LogInformation("GitHub user API status: {Status}", userResponse.StatusCode);
+
+            if (!userResponse.IsSuccessStatusCode)
+            {
+                _logger.LogWarning("GitHub user API failed: {Content}", userJson);
+                return null;
+            }
+
             var userElement = JsonSerializer.Deserialize<JsonElement>(userJson);
 
             var email = userElement.TryGetProperty("email", out var emailProp)
@@ -100,8 +134,9 @@ public class GithubAuthService : IGithubAuthService
                     ? idProp.ToString() : ""
             };
         }
-        catch
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "GitHub OAuth failed");
             return null;
         }
     }
