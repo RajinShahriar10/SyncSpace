@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
 using SyncSpace.Application.Common.Interfaces;
 using SyncSpace.Domain.Entities;
-using SyncSpace.Infrastructure.Identity;
+using SyncSpace.Persistence.Models;
 using SyncSpace.Persistence.Context;
 
 namespace SyncSpace.Infrastructure.Identity;

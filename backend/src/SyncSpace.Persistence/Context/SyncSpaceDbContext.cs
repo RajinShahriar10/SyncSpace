@@ -1,10 +1,13 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using SyncSpace.Domain.Common;
 using SyncSpace.Domain.Entities;
+using SyncSpace.Persistence.Models;
 
 namespace SyncSpace.Persistence.Context;
 
-public class SyncSpaceDbContext : DbContext
+public class SyncSpaceDbContext : IdentityDbContext<ApplicationUser, IdentityRole<Guid>, Guid>
 {
     public SyncSpaceDbContext(DbContextOptions<SyncSpaceDbContext> options) : base(options) { }
 
@@ -42,6 +45,8 @@ public class SyncSpaceDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder);
+
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SyncSpaceDbContext).Assembly);
 
         foreach (var entityType in modelBuilder.Model.GetEntityTypes())
@@ -54,8 +59,6 @@ public class SyncSpaceDbContext : DbContext
                     .HasDefaultValueSql("now()");
             }
         }
-
-        base.OnModelCreating(modelBuilder);
     }
 
     public override async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

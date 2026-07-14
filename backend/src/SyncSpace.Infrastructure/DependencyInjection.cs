@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using SyncSpace.Application.Common.Interfaces;
 using SyncSpace.Infrastructure.Identity;
 using SyncSpace.Persistence.Context;
+using SyncSpace.Persistence.Models;
 
 namespace SyncSpace.Infrastructure;
 

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using SyncSpace.Persistence.Context;
@@ -11,9 +12,11 @@ using SyncSpace.Persistence.Context;
 namespace SyncSpace.Persistence.Migrations
 {
     [DbContext(typeof(SyncSpaceDbContext))]
-    partial class SyncSpaceDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260714214838_AddIdentityTables")]
+    partial class AddIdentityTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

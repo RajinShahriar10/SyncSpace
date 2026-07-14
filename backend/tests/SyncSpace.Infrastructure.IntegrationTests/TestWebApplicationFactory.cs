@@ -233,8 +233,8 @@ public class TestRefreshTokenService : IRefreshTokenService
 
 public class TestGoogleAuthService : IGoogleAuthService
 {
-    public Task<GoogleUserInfo?> ValidateTokenAsync(string idToken)
-        => Task.FromResult<GoogleUserInfo?>(null);
+    public Task<ExternalUserInfo?> ValidateTokenAsync(string idToken)
+        => Task.FromResult<ExternalUserInfo?>(null);
 }
 
 public class TestCloudinaryService : ICloudinaryService

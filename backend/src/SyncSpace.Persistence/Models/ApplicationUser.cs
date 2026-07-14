@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace SyncSpace.Infrastructure.Identity;
+namespace SyncSpace.Persistence.Models;
 
 public class ApplicationUser : IdentityUser<Guid>
 {

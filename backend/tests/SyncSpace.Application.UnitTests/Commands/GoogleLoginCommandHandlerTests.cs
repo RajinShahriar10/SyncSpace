@@ -21,7 +21,7 @@ public class GoogleLoginCommandHandlerTests
         IdToken = "valid-google-token"
     };
 
-    private readonly GoogleUserInfo _googleUser = new()
+    private readonly ExternalUserInfo _googleUser = new()
     {
         Email = "googleuser@gmail.com",
         FirstName = "Google",
@@ -166,7 +166,7 @@ public class GoogleLoginCommandHandlerTests
     {
         _googleAuthServiceMock
             .Setup(x => x.ValidateTokenAsync(_validCommand.IdToken))
-            .ReturnsAsync((GoogleUserInfo?)null);
+            .ReturnsAsync((ExternalUserInfo?)null);
 
         var result = await _sut.Handle(_validCommand, CancellationToken.None);
 
