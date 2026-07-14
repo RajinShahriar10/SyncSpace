@@ -31,10 +31,6 @@ export interface RegisterRequest {
   lastName: string;
 }
 
-export interface GoogleLoginRequest {
-  idToken: string;
-}
-
 export interface GithubLoginRequest {
   accessToken: string;
 }
@@ -46,11 +42,6 @@ export async function login(data: LoginRequest): Promise<AuthResponse> {
 
 export async function register(data: RegisterRequest): Promise<AuthResponse> {
   const response = await api.post<AuthResponse>("/auth/register", data);
-  return response.data;
-}
-
-export async function googleLogin(data: GoogleLoginRequest): Promise<AuthResponse> {
-  const response = await api.post<AuthResponse>("/auth/google", data);
   return response.data;
 }
 

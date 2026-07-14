@@ -11,7 +11,6 @@ interface AuthState {
   error: string | null;
   login: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   register: (data: authLib.RegisterRequest) => Promise<void>;
-  googleLogin: (idToken: string) => Promise<void>;
   githubLogin: (accessToken: string) => Promise<void>;
   setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
@@ -62,28 +61,6 @@ export const useAuthStore = create<AuthState>((set) => ({
       } else {
         set({ error: response.message || "Registration failed", isLoading: false });
         throw new Error(response.message || "Registration failed");
-      }
-    } catch (error: unknown) {
-      const message = error instanceof Error ? error.message : "An unexpected error occurred";
-      set({ error: message, isLoading: false });
-      throw error;
-    }
-  },
-
-  googleLogin: async (idToken) => {
-    set({ isLoading: true, error: null });
-    try {
-      const response = await authLib.googleLogin({ idToken });
-      if (response.success) {
-        authLib.storeTokens(response.data.accessToken, response.data.refreshToken);
-        set({
-          user: response.data.user as User,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-      } else {
-        set({ error: response.message || "Google login failed", isLoading: false });
-        throw new Error(response.message || "Google login failed");
       }
     } catch (error: unknown) {
       const message = error instanceof Error ? error.message : "An unexpected error occurred";
