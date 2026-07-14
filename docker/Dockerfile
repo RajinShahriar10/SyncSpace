@@ -12,7 +12,7 @@ COPY ["backend/src/SyncSpace.Domain/SyncSpace.Domain.csproj", "src/SyncSpace.Dom
 COPY ["backend/src/SyncSpace.Infrastructure/SyncSpace.Infrastructure.csproj", "src/SyncSpace.Infrastructure/"]
 COPY ["backend/src/SyncSpace.Persistence/SyncSpace.Persistence.csproj", "src/SyncSpace.Persistence/"]
 RUN dotnet restore "src/SyncSpace.API/SyncSpace.API.csproj"
-COPY backend/ .
+COPY backend/src/ src/
 WORKDIR "/src/SyncSpace.API"
 RUN dotnet publish -c Release -o /app/publish /p:UseAppHost=false --no-restore
 
