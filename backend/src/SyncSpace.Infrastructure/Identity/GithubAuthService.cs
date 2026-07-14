@@ -15,8 +15,12 @@ public class GithubAuthService : IGithubAuthService
     public GithubAuthService(HttpClient httpClient, IConfiguration configuration)
     {
         _httpClient = httpClient;
-        _clientId = configuration["GitHub:ClientId"] ?? configuration["GITHUB_CLIENT_ID"] ?? "";
-        _clientSecret = configuration["GitHub:ClientSecret"] ?? configuration["GITHUB_CLIENT_SECRET"] ?? "";
+        _clientId = Environment.GetEnvironmentVariable("GITHUB_CLIENT_ID")
+            ?? configuration["GitHub:ClientId"]
+            ?? "";
+        _clientSecret = Environment.GetEnvironmentVariable("GITHUB_CLIENT_SECRET")
+            ?? configuration["GitHub:ClientSecret"]
+            ?? "";
     }
 
     public async Task<ExternalUserInfo?> GetUserInfoAsync(string code)
