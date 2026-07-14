@@ -26,13 +26,13 @@ export default function Home() {
               Get Started
             </Button>
           </Link>
-          <Link href="/dashboard">
+          <Link href="/register">
             <Button
               size="lg"
               variant="outline"
               className="border-white/10 bg-white/5 hover:bg-white/10"
             >
-              View Demo
+              Create Account
             </Button>
           </Link>
         </div>

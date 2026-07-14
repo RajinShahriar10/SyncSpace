@@ -1,15 +1,18 @@
 "use client";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { FileText, KanbanSquare, MessageSquare, Users } from "lucide-react";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { useAuthStore } from "@/store";
 
 const stats = [
-  { title: "Active Documents", value: "24", change: "+3 today", icon: FileText, color: "text-primary" },
-  { title: "Board Tasks", value: "128", change: "12 completed", icon: KanbanSquare, color: "text-secondary" },
-  { title: "Messages", value: "1.2K", change: "48 unread", icon: MessageSquare, color: "text-accent" },
-  { title: "Team Members", value: "16", change: "+2 this week", icon: Users, color: "text-emerald-400" },
+  { title: "Active Documents", value: "0", change: "Create your first document", icon: FileText, color: "text-primary" },
+  { title: "Board Tasks", value: "0", change: "Create your first board", icon: KanbanSquare, color: "text-secondary" },
+  { title: "Messages", value: "0", change: "Start a conversation", icon: MessageSquare, color: "text-accent" },
+  { title: "Team Members", value: "1", change: "Invite your team", icon: Users, color: "text-emerald-400" },
 ];
 
 const container = {
@@ -26,6 +29,27 @@ const item = {
 };
 
 export default function DashboardPage() {
+  const router = useRouter();
+  const { user, isAuthenticated, isLoading } = useAuthStore();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push("/login");
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-full">
+          <div className="h-8 w-8 animate-spin rounded-full border-2 border-primary border-t-transparent" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (!isAuthenticated || !user) return null;
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
@@ -34,8 +58,10 @@ export default function DashboardPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
         >
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Dashboard</h1>
-          <p className="text-muted-foreground">Welcome back. Here&apos;s what&apos;s happening.</p>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
+            Welcome back, {user.firstName}
+          </h1>
+          <p className="text-muted-foreground">Here&apos;s what&apos;s happening with your workspace.</p>
         </motion.div>
 
         <motion.div

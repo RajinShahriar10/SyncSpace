@@ -1,9 +1,9 @@
 "use client";
 
-import { Suspense, useState, useEffect, useCallback } from "react";
+import { Suspense, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,7 +24,6 @@ const GITHUB_CLIENT_ID = process.env.NEXT_PUBLIC_GITHUB_CLIENT_ID || "";
 
 function LoginForm() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login, githubLogin, error, setError } = useAuthStore();
   const [isLoading, setIsLoading] = useState(false);
   const [isGithubLoading, setIsGithubLoading] = useState(false);
@@ -41,42 +40,6 @@ function LoginForm() {
       rememberMe: false,
     },
   });
-
-  const handleGithubCallback = useCallback(async (code: string) => {
-    setIsGithubLoading(true);
-    setError(null);
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/github`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ accessToken: code }),
-      });
-      const data = await response.json();
-      if (data.success) {
-        const { storeTokens } = await import("@/lib/auth");
-        storeTokens(data.data.accessToken, data.data.refreshToken);
-        useAuthStore.setState({
-          user: data.data.user,
-          isAuthenticated: true,
-          isLoading: false,
-        });
-        router.push("/dashboard");
-      } else {
-        setError(data.message || "GitHub login failed");
-      }
-    } catch {
-      setError("GitHub login failed");
-    } finally {
-      setIsGithubLoading(false);
-    }
-  }, [router, setError]);
-
-  useEffect(() => {
-    const code = searchParams.get("code");
-    if (code) {
-      handleGithubCallback(code);
-    }
-  }, [searchParams, handleGithubCallback]);
 
   const onSubmit = async (data: LoginFormData) => {
     setIsLoading(true);
@@ -96,7 +59,7 @@ function LoginForm() {
       setError("GitHub login is not configured");
       return;
     }
-    const redirectUri = `${window.location.origin}/`;
+    const redirectUri = `${window.location.origin}/auth/callback`;
     const githubUrl = `https://github.com/login/oauth/authorize?client_id=${GITHUB_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&scope=user:email`;
     window.location.href = githubUrl;
   };
