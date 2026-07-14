@@ -33,9 +33,18 @@ public class GithubAuthService : IGithubAuthService
             {
                 var emails = await _httpClient.GetFromJsonAsync<JsonElement[]>(
                     "https://api.github.com/user/emails");
-                email = emails?.FirstOrDefault(e =>
-                    e.GetProperty("primary").GetBoolean())?
-                    .GetProperty("email").GetString();
+                if (emails != null)
+                {
+                    foreach (var e in emails)
+                    {
+                        if (e.TryGetProperty("primary", out var primary) && primary.GetBoolean())
+                        {
+                            email = e.TryGetProperty("email", out var emailVal)
+                                ? emailVal.GetString() : null;
+                            break;
+                        }
+                    }
+                }
             }
 
             if (string.IsNullOrEmpty(email))
