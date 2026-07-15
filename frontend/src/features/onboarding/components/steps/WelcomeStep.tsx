@@ -16,7 +16,7 @@ const features = [
   { icon: "Documents", label: "Real-time documents", desc: "Collaborate instantly" },
   { icon: "Boards", label: "Kanban boards", desc: "Track every task" },
   { icon: "Messages", label: "Team messaging", desc: "Stay connected" },
-  { icon: "Workspaces", label: "Shared spaces", desc: "Organize everything" },
+  { icon: "Projects", label: "Project spaces", desc: "Organize everything" },
 ];
 
 export function WelcomeStep() {
@@ -71,11 +71,11 @@ export function WelcomeStep() {
         className="relative z-10 text-center"
       >
         <h1 className="mb-4 text-5xl font-bold tracking-tight md:text-6xl">
-          <span className="gradient-text">Welcome to SyncSpace</span>
+          <span className="gradient-text">Welcome to SyncSpace EDU</span>
         </h1>
         <p className="mx-auto mb-12 max-w-lg text-lg text-muted-foreground">
-          Your all-in-one platform for documents, boards, messaging, and real-time
-          collaboration. Let&apos;s get you set up in just a few steps.
+          Your all-in-one platform for university project collaboration. Create courses,
+          manage groups, track milestones, and work together in real-time.
         </p>
       </motion.div>
 
@@ -98,7 +98,7 @@ export function WelcomeStep() {
               {feature.icon === "Documents" && "📄"}
               {feature.icon === "Boards" && "📋"}
               {feature.icon === "Messages" && "💬"}
-              {feature.icon === "Workspaces" && "🏠"}
+              {feature.icon === "Projects" && "🏠"}
             </div>
             <p className="text-sm font-medium">{feature.label}</p>
             <p className="text-xs text-muted-foreground">{feature.desc}</p>

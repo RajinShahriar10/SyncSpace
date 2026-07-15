@@ -54,15 +54,15 @@ export function InviteTeamStep() {
           >
             <Users className="h-8 w-8 text-secondary" />
           </motion.div>
-          <h2 className="mb-2 text-3xl font-bold">Invite Your Team</h2>
+          <h2 className="mb-2 text-3xl font-bold">Invite Your Group</h2>
           <p className="text-muted-foreground">
-            Collaboration is better together. Add your teammates.
+            Collaboration is better together. Add your group members.
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Team Members</CardTitle>
+            <CardTitle>Group Members</CardTitle>
             <CardDescription>Enter email addresses to send invitations</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -70,7 +70,7 @@ export function InviteTeamStep() {
               <div className="relative flex-1">
                 <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                 <Input
-                  placeholder="colleague@company.com"
+                  placeholder="classmate@university.edu"
                   type="email"
                   value={email}
                   onChange={(e) => {
@@ -127,7 +127,7 @@ export function InviteTeamStep() {
               <div className="rounded-lg border border-dashed border-white/10 py-8 text-center">
                 <UserPlus className="mx-auto mb-2 h-8 w-8 text-muted-foreground" />
                 <p className="text-sm text-muted-foreground">
-                  No team members added yet
+                  No group members added yet
                 </p>
               </div>
             )}

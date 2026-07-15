@@ -42,6 +42,12 @@ public class SyncSpaceDbContext : IdentityDbContext<ApplicationUser, IdentityRol
     public DbSet<DriveFile> DriveFiles => Set<DriveFile>();
     public DbSet<DriveFolder> DriveFolders => Set<DriveFolder>();
     public DbSet<AuditLog> AuditLogs => Set<AuditLog>();
+    public DbSet<Course> Courses => Set<Course>();
+    public DbSet<ProjectGroup> ProjectGroups => Set<ProjectGroup>();
+    public DbSet<ProjectGroupMember> ProjectGroupMembers => Set<ProjectGroupMember>();
+    public DbSet<Milestone> Milestones => Set<Milestone>();
+    public DbSet<StudentProfile> StudentProfiles => Set<StudentProfile>();
+    public DbSet<InstructorProfile> InstructorProfiles => Set<InstructorProfile>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

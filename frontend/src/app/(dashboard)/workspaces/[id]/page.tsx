@@ -80,7 +80,7 @@ export default function WorkspaceDetailPage() {
     {
       icon: Users,
       label: "Members",
-      desc: "Team access control",
+      desc: "Group access control",
       href: `/workspaces/${workspaceId}/members`,
       gradient: "from-emerald-500/20 to-emerald-500/5",
       iconColor: "text-emerald-400",
@@ -96,7 +96,7 @@ export default function WorkspaceDetailPage() {
     {
       icon: BarChart3,
       label: "Analytics",
-      desc: "Workspace insights",
+      desc: "Project insights",
       href: `/workspaces/${workspaceId}/analytics`,
       gradient: "from-rose-500/20 to-rose-500/5",
       iconColor: "text-rose-400",
@@ -104,7 +104,7 @@ export default function WorkspaceDetailPage() {
     {
       icon: Settings,
       label: "Settings",
-      desc: "Configure workspace",
+      desc: "Configure project",
       href: `/workspaces/${workspaceId}/settings`,
       gradient: "from-violet-500/20 to-violet-500/5",
       iconColor: "text-violet-400",
@@ -121,7 +121,7 @@ export default function WorkspaceDetailPage() {
             className="mb-6 gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            All Workspaces
+            All Projects
           </Button>
 
           <div className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 sm:p-8">
@@ -192,7 +192,7 @@ export default function WorkspaceDetailPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-base font-semibold mb-4">Workspace Sections</h2>
+          <h2 className="text-base font-semibold mb-4">Project Sections</h2>
           <motion.div
             variants={container}
             initial="hidden"
@@ -231,7 +231,7 @@ export default function WorkspaceDetailPage() {
             transition={{ delay: 0.3 }}
           >
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base font-semibold">Team Members</h2>
+              <h2 className="text-base font-semibold">Group Members</h2>
               <Button
                 variant="ghost"
                 size="sm"

@@ -12,14 +12,14 @@ import { useAuthStore } from "@/store";
 import { ArrowLeft, UserPlus, X, Shield, Edit3, Eye, Crown } from "lucide-react";
 
 const ROLES = [
-  { value: "Admin", label: "Admin", icon: Shield, desc: "Full access except delete" },
-  { value: "Editor", label: "Editor", icon: Edit3, desc: "Create and edit content" },
+  { value: "Admin", label: "Instructor", icon: Shield, desc: "Full access except delete" },
+  { value: "Editor", label: "Member", icon: Edit3, desc: "Create and edit content" },
   { value: "Viewer", label: "Viewer", icon: Eye, desc: "Read-only access" },
 ];
 
 const roleColors: Record<string, string> = {
   Owner: "text-amber-400 bg-amber-400/10",
-  Admin: "text-red-400 bg-red-400/10",
+  Admin: "text-purple-400 bg-purple-400/10",
   Editor: "text-primary bg-primary/10",
   Viewer: "text-muted-foreground bg-white/5",
 };
@@ -87,9 +87,9 @@ export default function WorkspaceMembersPage() {
             <ArrowLeft className="h-4 w-4" />
             Back
           </Button>
-          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Team Members</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Group Members</h1>
           <p className="text-muted-foreground">
-            Manage who has access to {currentWorkspace?.name || "this workspace"}
+            Manage who has access to {currentWorkspace?.name || "this project"}
           </p>
         </motion.div>
 
@@ -97,12 +97,12 @@ export default function WorkspaceMembersPage() {
           <Card>
             <CardHeader>
               <CardTitle>Invite Member</CardTitle>
-              <CardDescription>Send an invitation to a team member</CardDescription>
+              <CardDescription>Send an invitation to a group member</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex flex-col sm:flex-row gap-2">
                 <Input
-                  placeholder="colleague@company.com"
+                  placeholder="classmate@university.edu"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -186,7 +186,7 @@ export default function WorkspaceMembersPage() {
                         {isOwner ? (
                           <span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ${roleColors["Owner"]}`}>
                             <Crown className="h-3 w-3" />
-                            Owner
+                            Project Leader
                           </span>
                         ) : (
                           <select
@@ -195,8 +195,8 @@ export default function WorkspaceMembersPage() {
                             disabled={!canManage}
                             className="rounded-lg border border-white/10 bg-white/5 px-2 py-1 text-xs text-foreground disabled:opacity-50"
                           >
-                            <option value="Admin">Admin</option>
-                            <option value="Editor">Editor</option>
+                            <option value="Admin">Instructor</option>
+                            <option value="Editor">Member</option>
                             <option value="Viewer">Viewer</option>
                           </select>
                         )}

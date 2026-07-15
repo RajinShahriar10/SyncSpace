@@ -10,8 +10,10 @@ public class Workspace : AuditableEntity
     public string? IconUrl { get; set; }
     public Guid OwnerId { get; set; }
     public string Plan { get; set; } = "free";
+    public Guid? ProjectGroupId { get; set; }
 
     public User Owner { get; set; } = null!;
+    public ProjectGroup? ProjectGroup { get; set; }
     public ICollection<WorkspaceMember> Members { get; set; } = new List<WorkspaceMember>();
     public ICollection<Document> Documents { get; set; } = new List<Document>();
     public ICollection<Board> Boards { get; set; } = new List<Board>();

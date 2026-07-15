@@ -69,7 +69,7 @@ export default function FilesPage() {
               <div>
                 <h1 className="text-2xl font-bold tracking-tight">Files</h1>
                 <p className="text-sm text-muted-foreground">
-                  {currentWorkspace?.name} &middot; Manage workspace files
+                  {currentWorkspace?.name} &middot; Manage project files
                 </p>
               </div>
             </div>

@@ -77,7 +77,7 @@ export function CompletionScreen() {
           transition={{ delay: 0.5 }}
           className="mb-2 text-lg text-muted-foreground"
         >
-          Welcome to <span className="font-semibold text-foreground">{workspace.name || "Your Workspace"}</span>
+          Welcome to <span className="font-semibold text-foreground">{workspace.name || "Your Project"}</span>
         </motion.p>
         <motion.p
           initial={{ opacity: 0, y: 20 }}
@@ -85,7 +85,7 @@ export function CompletionScreen() {
           transition={{ delay: 0.6 }}
           className="mb-10 text-muted-foreground"
         >
-          Your team is going to love it here. Let&apos;s dive in!
+          Your group is going to love it here. Let&apos;s dive in!
         </motion.p>
 
         <motion.div

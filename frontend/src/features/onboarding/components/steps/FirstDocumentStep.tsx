@@ -49,7 +49,7 @@ export function FirstDocumentStep() {
           </motion.div>
           <h2 className="mb-2 text-3xl font-bold">Create Your First Document</h2>
           <p className="text-muted-foreground">
-            Every great workspace starts with a great document.
+            Every great project starts with a great document.
           </p>
         </div>
 
@@ -62,12 +62,12 @@ export function FirstDocumentStep() {
             <Input
               placeholder={
                 selectedTemplate === "meeting"
-                  ? "Weekly Standup - June 12"
+                  ? "Sprint Planning - Week 5"
                   : selectedTemplate === "project"
-                    ? "Q3 Product Roadmap"
+                    ? "Project Roadmap"
                     : selectedTemplate === "spec"
-                      ? "API Design Specification"
-                      : "Getting Started with " + (workspace.name || "My Workspace")
+                      ? "System Design Specification"
+                      : "Getting Started with " + (workspace.name || "My Project")
               }
               value={document.title}
               onChange={(e) => setDocument({ title: e.target.value })}

@@ -63,12 +63,12 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      title: "Workspaces",
+      title: "Courses",
       value: overview?.totalWorkspaces ?? 0,
       icon: FolderOpen,
       color: "from-violet-500/20 to-violet-600/5",
       iconColor: "text-violet-400",
-      href: "/workspaces",
+      href: "/courses",
     },
     {
       title: "Documents",
@@ -80,7 +80,7 @@ export default function DashboardPage() {
       href: "/documents",
     },
     {
-      title: "Board Tasks",
+      title: "Tasks",
       value: overview?.totalTasks ?? 0,
       icon: KanbanSquare,
       color: "from-secondary/20 to-secondary/5",
@@ -99,12 +99,12 @@ export default function DashboardPage() {
   ];
 
   const quickActions = [
-    { label: "New Workspace", icon: FolderOpen, href: "/workspaces", color: "bg-violet-500/10 text-violet-400" },
+    { label: "New Course", icon: FolderOpen, href: "/courses", color: "bg-violet-500/10 text-violet-400" },
     { label: "New Document", icon: FileText, href: "/documents", color: "bg-primary/10 text-primary" },
-    { label: "View Boards", icon: KanbanSquare, href: "/boards", color: "bg-secondary/10 text-secondary" },
+    { label: "Task Boards", icon: KanbanSquare, href: "/boards", color: "bg-secondary/10 text-secondary" },
     { label: "Team Chat", icon: MessageSquare, href: "/messages", color: "bg-accent/10 text-accent" },
     { label: "Analytics", icon: BarChart3, href: "/analytics", color: "bg-emerald-500/10 text-emerald-400" },
-    { label: "Admin Panel", icon: Zap, href: "/admin", color: "bg-amber-500/10 text-amber-400" },
+    { label: "My Projects", icon: FolderOpen, href: "/workspaces", color: "bg-amber-500/10 text-amber-400" },
   ];
 
   return (
@@ -125,7 +125,7 @@ export default function DashboardPage() {
               </h1>
             </div>
             <p className="text-muted-foreground mt-1">
-              Here&apos;s what&apos;s happening across your workspaces today.
+              Here&apos;s what&apos;s happening across your courses and projects today.
             </p>
           </div>
           <div className="absolute -right-8 -top-8 h-32 w-32 rounded-full bg-primary/5 blur-3xl" />
@@ -177,7 +177,7 @@ export default function DashboardPage() {
           >
             <Card className="h-full">
               <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle className="text-base">Recent Workspaces</CardTitle>
+                <CardTitle className="text-base">Recent Projects</CardTitle>
                 <Button variant="ghost" size="sm" className="gap-1 text-xs" onClick={() => router.push("/workspaces")}>
                   View all <ArrowRight className="h-3 w-3" />
                 </Button>
@@ -186,7 +186,7 @@ export default function DashboardPage() {
                 {workspaces.length === 0 ? (
                   <div className="flex flex-col items-center justify-center py-12 text-center">
                     <FolderOpen className="h-10 w-10 text-muted-foreground/30 mb-3" />
-                    <p className="text-sm text-muted-foreground">No workspaces yet</p>
+                    <p className="text-sm text-muted-foreground">No projects yet</p>
                     <Button size="sm" className="mt-3 gap-1" onClick={() => router.push("/workspaces")}>
                       <Plus className="h-3 w-3" /> Create one
                     </Button>
@@ -268,7 +268,7 @@ export default function DashboardPage() {
                   <div className="rounded-xl bg-white/[0.03] p-4 text-center">
                     <FolderOpen className="h-5 w-5 text-violet-400 mx-auto mb-2" />
                     <p className="text-2xl font-bold">{overview.totalWorkspaces}</p>
-                    <p className="text-xs text-muted-foreground">Workspaces</p>
+                    <p className="text-xs text-muted-foreground">Projects</p>
                   </div>
                   <div className="rounded-xl bg-white/[0.03] p-4 text-center">
                     <FileText className="h-5 w-5 text-primary mx-auto mb-2" />

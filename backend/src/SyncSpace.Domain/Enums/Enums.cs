@@ -83,5 +83,13 @@ public enum AuditAction
     FileMoved = 15,
     CommentAdded = 16,
     WorkspaceCreated = 17,
-    WorkspaceUpdated = 18
+    WorkspaceUpdated = 18,
+    CourseCreated = 19,
+    MilestoneCompleted = 20
+}
+
+public enum AcademicRole
+{
+    Student = 0,
+    Instructor = 1
 }

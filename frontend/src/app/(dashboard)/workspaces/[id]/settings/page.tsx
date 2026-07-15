@@ -97,17 +97,17 @@ export default function WorkspaceSettingsPage() {
             className="mb-4 gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
-            Back to Workspaces
+            Back to Projects
           </Button>
-          <h1 className="text-xl font-bold tracking-tight sm:text-2xl">Workspace Settings</h1>
-          <p className="text-muted-foreground">Manage your workspace details</p>
+          <h1 className="text-xl font-bold tracking-tight sm:text-2xl">Project Settings</h1>
+          <p className="text-muted-foreground">Manage your project details</p>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
           <Card>
             <CardHeader>
               <CardTitle>General</CardTitle>
-              <CardDescription>Update your workspace name and description</CardDescription>
+              <CardDescription>Update your project name and description</CardDescription>
             </CardHeader>
             <CardContent>
               <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
@@ -119,7 +119,7 @@ export default function WorkspaceSettingsPage() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Slug</label>
-                  <Input {...register("slug")} placeholder="workspace-slug" />
+                  <Input {...register("slug")} placeholder="project-slug" />
                   {watchName && (
                     <p className="text-xs text-muted-foreground">
                       URL: /workspaces/{(watchName || "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")}
@@ -130,7 +130,7 @@ export default function WorkspaceSettingsPage() {
 
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Description</label>
-                  <Input {...register("description")} placeholder="What's this workspace for?" />
+                  <Input {...register("description")} placeholder="What's this project about?" />
                 </div>
 
                 <div className="flex justify-end">
@@ -148,12 +148,12 @@ export default function WorkspaceSettingsPage() {
           <Card className="border-destructive/20">
             <CardHeader>
               <CardTitle className="text-destructive">Danger Zone</CardTitle>
-              <CardDescription>Permanently delete this workspace and all its data</CardDescription>
+              <CardDescription>Permanently delete this project and all its data</CardDescription>
             </CardHeader>
             <CardContent>
               <Button variant="destructive" onClick={handleDelete} className="gap-2">
                 <Trash2 className="h-4 w-4" />
-                Delete Workspace
+                Delete Project
               </Button>
             </CardContent>
           </Card>

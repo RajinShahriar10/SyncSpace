@@ -40,25 +40,25 @@ export function CreateWorkspaceStep() {
           >
             <Building2 className="h-8 w-8 text-primary" />
           </motion.div>
-          <h2 className="mb-2 text-3xl font-bold">Create Your Workspace</h2>
+          <h2 className="mb-2 text-3xl font-bold">Create Your Project</h2>
           <p className="text-muted-foreground">
-            This is where your team will come together to collaborate.
+            This is where your group will come together to collaborate.
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Workspace Details</CardTitle>
-            <CardDescription>Give your workspace a name and description</CardDescription>
+            <CardTitle>Project Details</CardTitle>
+            <CardDescription>Give your project a name and description</CardDescription>
           </CardHeader>
           <CardContent className="space-y-5">
             <div className="space-y-2">
               <label htmlFor="ws-name" className="text-sm font-medium">
-                Workspace Name <span className="text-destructive">*</span>
+                Project Name <span className="text-destructive">*</span>
               </label>
               <Input
                 id="ws-name"
-                placeholder="Acme Corp"
+                placeholder="CS401 Final Project"
                 value={workspace.name}
                 onChange={(e) => handleSlugPreview(e.target.value)}
                 onBlur={() => setTouched(true)}
@@ -91,7 +91,7 @@ export function CreateWorkspaceStep() {
               </label>
               <Input
                 id="ws-desc"
-                placeholder="What's this workspace for?"
+                placeholder="What's this project about?"
                 value={workspace.description}
                 onChange={(e) => setWorkspace({ description: e.target.value })}
               />

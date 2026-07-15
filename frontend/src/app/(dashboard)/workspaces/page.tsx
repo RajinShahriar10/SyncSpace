@@ -96,12 +96,12 @@ export default function WorkspacesPage() {
           className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4"
         >
           <div>
-            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Workspaces</h1>
-            <p className="text-muted-foreground">Manage your team workspaces</p>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">Projects</h1>
+            <p className="text-muted-foreground">Manage your project workspaces</p>
           </div>
           <Button onClick={() => setShowCreate(true)} className="gap-2 shadow-lg shadow-primary/20">
             <Plus className="h-4 w-4" />
-            New Workspace
+            New Project
           </Button>
         </motion.div>
 
@@ -117,7 +117,7 @@ export default function WorkspacesPage() {
                   <form onSubmit={handleSubmit(onCreate)} className="space-y-4">
                     <div className="flex items-center gap-2 mb-2">
                       <Sparkles className="h-4 w-4 text-primary" />
-                      <span className="text-sm font-medium">Create New Workspace</span>
+                      <span className="text-sm font-medium">Create New Project</span>
                     </div>
                     <div className="space-y-2">
                       <Input placeholder="Workspace name" {...register("name")} className="h-11" />
@@ -178,7 +178,7 @@ export default function WorkspacesPage() {
         ) : filteredWorkspaces.length === 0 && workspaces.length > 0 ? (
           <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="py-20 text-center">
             <Search className="mx-auto mb-4 h-10 w-10 text-muted-foreground/30" />
-            <h3 className="mb-2 text-lg font-medium">No matching workspaces</h3>
+            <h3 className="mb-2 text-lg font-medium">No matching projects</h3>
             <p className="text-muted-foreground">Try a different search term.</p>
           </motion.div>
         ) : workspaces.length === 0 ? (
@@ -189,13 +189,13 @@ export default function WorkspacesPage() {
                 <Folder className="h-8 w-8 text-primary" />
               </div>
             </div>
-            <h3 className="mb-2 text-lg font-medium">No workspaces yet</h3>
+            <h3 className="mb-2 text-lg font-medium">No projects yet</h3>
             <p className="mb-6 text-muted-foreground max-w-sm mx-auto">
-              Create your first workspace to start collaborating with your team.
+              Create your first project workspace to start collaborating.
             </p>
             <Button onClick={() => setShowCreate(true)} className="gap-2 shadow-lg shadow-primary/20">
               <Plus className="h-4 w-4" />
-              Create Workspace
+              Create Project
             </Button>
           </motion.div>
         ) : (
