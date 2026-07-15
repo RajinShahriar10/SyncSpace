@@ -17,7 +17,7 @@ import { ArrowLeft, Plus, Users, LayoutGrid, Calendar, Trash2, Target, CheckCirc
 import { formatDistanceToNow } from "date-fns";
 
 const groupSchema = z.object({ groupName: z.string().min(2, "Name required") });
-const milestoneSchema = z.object({ title: z.string().min(2, "Title required"), description: z.string().optional(), dueDate: z.string().min(1, "Due date required") });
+const milestoneSchema = z.object({ title: z.string().min(2, "Title required"), description: z.string().optional(), startDate: z.string().min(1, "Start date required"), dueDate: z.string().min(1, "Due date required") });
 
 export default function CourseDetailPage() {
   const router = useRouter();
@@ -25,13 +25,13 @@ export default function CourseDetailPage() {
   const courseId = params.id as string;
   const { currentCourse, fetchCourse, deleteCourse } = useCourseStore();
   const { groups, fetchGroupsByCourse, createGroup, deleteGroup } = useProjectGroupStore();
-  const { milestones, fetchMilestones, createMilestone, updateMilestone, deleteMilestone } = useMilestoneStore();
+  const { milestones, fetchMilestones, createMilestone, updateMilestone, deleteMilestone, completeMilestone } = useMilestoneStore();
   const [showCreateGroup, setShowCreateGroup] = useState(false);
   const [showCreateMilestone, setShowCreateMilestone] = useState(false);
   const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
 
   const groupForm = useForm<{ groupName: string }>({ resolver: zodResolver(groupSchema) });
-  const milestoneForm = useForm<{ title: string; description?: string; dueDate: string }>({ resolver: zodResolver(milestoneSchema) });
+  const milestoneForm = useForm<{ title: string; description?: string; startDate: string; dueDate: string }>({ resolver: zodResolver(milestoneSchema) });
 
   useEffect(() => { fetchCourse(courseId); fetchGroupsByCourse(courseId); }, [courseId, fetchCourse, fetchGroupsByCourse]);
 
@@ -46,7 +46,7 @@ export default function CourseDetailPage() {
     fetchGroupsByCourse(courseId);
   };
 
-  const onCreateMilestone = async (data: { title: string; description?: string; dueDate: string }) => {
+  const onCreateMilestone = async (data: { title: string; description?: string; startDate: string; dueDate: string }) => {
     if (!selectedGroup) return;
     await createMilestone({ ...data, projectGroupId: selectedGroup });
     milestoneForm.reset();
@@ -131,7 +131,16 @@ export default function CourseDetailPage() {
                 <form onSubmit={milestoneForm.handleSubmit(onCreateMilestone)} className="space-y-3">
                   <Input placeholder="Title" {...milestoneForm.register("title")} className="h-9" />
                   <Input placeholder="Description (optional)" {...milestoneForm.register("description")} className="h-9" />
-                  <Input type="date" {...milestoneForm.register("dueDate")} className="h-9" />
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Start Date</label>
+                      <Input type="date" {...milestoneForm.register("startDate")} className="h-9" />
+                    </div>
+                    <div>
+                      <label className="text-xs text-muted-foreground mb-1 block">Due Date</label>
+                      <Input type="date" {...milestoneForm.register("dueDate")} className="h-9" />
+                    </div>
+                  </div>
                   <div className="flex gap-2">
                     <Button type="submit" size="sm" className="h-9">Create</Button>
                     <Button type="button" variant="ghost" size="sm" className="h-9" onClick={() => setShowCreateMilestone(false)}>Cancel</Button>
@@ -141,17 +150,25 @@ export default function CourseDetailPage() {
             ) : (
               <div className="space-y-2">
                 {milestones.map((m) => (
-                  <Card key={m.id} className={`transition-all ${m.isCompleted ? "opacity-60" : ""}`}>
+                  <Card key={m.id} className={`cursor-pointer transition-all hover:bg-white/[0.07] ${m.isCompleted ? "opacity-60" : ""}`} onClick={() => router.push(`/milestones/${m.id}`)}>
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between gap-2">
                         <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-medium ${m.isCompleted ? "line-through" : ""}`}>{m.title}</p>
+                          <div className="flex items-center gap-2">
+                            <p className={`text-sm font-medium ${m.isCompleted ? "line-through" : ""}`}>{m.title}</p>
+                            <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${
+                              m.status === "Completed" ? "bg-emerald-500/20 text-emerald-400" :
+                              m.status === "InProgress" ? "bg-blue-500/20 text-blue-400" :
+                              m.status === "Delayed" ? "bg-amber-500/20 text-amber-400" :
+                              "bg-white/10 text-muted-foreground"
+                            }`}>{m.status}</span>
+                          </div>
                           {m.description && <p className="text-xs text-muted-foreground mt-0.5">{m.description}</p>}
-                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Calendar className="h-3 w-3" /> Due {formatDistanceToNow(new Date(m.dueDate), { addSuffix: true })}</p>
+                          <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1"><Calendar className="h-3 w-3" /> {new Date(m.startDate).toLocaleDateString()} - Due {formatDistanceToNow(new Date(m.dueDate), { addSuffix: true })}</p>
                         </div>
                         <div className="flex gap-1 shrink-0">
-                          {!m.isCompleted && <Button variant="ghost" size="icon" className="h-6 w-6 text-emerald-400" onClick={() => updateMilestone(m.id, { isCompleted: true })}><CheckCircle2 className="h-3.5 w-3.5" /></Button>}
-                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={() => deleteMilestone(m.id)}><Trash2 className="h-3 w-3" /></Button>
+                          {!m.isCompleted && <Button variant="ghost" size="icon" className="h-6 w-6 text-emerald-400" onClick={(e) => { e.stopPropagation(); completeMilestone(m.id); }}><CheckCircle2 className="h-3.5 w-3.5" /></Button>}
+                          <Button variant="ghost" size="icon" className="h-6 w-6 text-destructive" onClick={(e) => { e.stopPropagation(); deleteMilestone(m.id); }}><Trash2 className="h-3 w-3" /></Button>
                         </div>
                       </div>
                     </CardContent>

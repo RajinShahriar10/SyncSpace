@@ -49,6 +49,8 @@ public class SyncSpaceDbContext : IdentityDbContext<ApplicationUser, IdentityRol
     public DbSet<StudentProfile> StudentProfiles => Set<StudentProfile>();
     public DbSet<InstructorProfile> InstructorProfiles => Set<InstructorProfile>();
     public DbSet<ContributionRecord> ContributionRecords => Set<ContributionRecord>();
+    public DbSet<MilestoneAssignment> MilestoneAssignments => Set<MilestoneAssignment>();
+    public DbSet<MilestoneReminder> MilestoneReminders => Set<MilestoneReminder>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

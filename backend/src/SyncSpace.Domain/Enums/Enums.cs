@@ -103,3 +103,12 @@ public enum ContributionActivity
     CommentAdded = 4,
     MessageSent = 5
 }
+
+public enum MilestoneStatus
+{
+    NotStarted = 0,
+    InProgress = 1,
+    Completed = 2,
+    Delayed = 3,
+    Cancelled = 4
+}

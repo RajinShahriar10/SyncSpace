@@ -122,6 +122,9 @@ builder.Services.AddScoped<SyncSpace.API.Services.IContributionEngine, SyncSpace
 // Instructor Dashboard
 builder.Services.AddScoped<SyncSpace.API.Services.IInstructorDashboardService, SyncSpace.API.Services.InstructorDashboardService>();
 
+// Milestone Management
+builder.Services.AddScoped<SyncSpace.API.Services.IMilestoneService, SyncSpace.API.Services.MilestoneService>();
+
 // Health Checks
 builder.Services.AddHealthChecks()
     .AddNpgSql(
