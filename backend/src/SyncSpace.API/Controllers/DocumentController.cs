@@ -7,6 +7,7 @@ using SyncSpace.Application.Features.Documents.DTOs;
 using SyncSpace.Application.Features.Documents.Commands;
 using SyncSpace.Application.Features.Documents.Queries;
 using SyncSpace.Domain.Enums;
+using SyncSpace.API.Services;
 
 namespace SyncSpace.API.Controllers;
 
@@ -17,11 +18,13 @@ public class DocumentController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IAuditService _auditService;
+    private readonly IContributionEngine _contributionEngine;
 
-    public DocumentController(IMediator mediator, IAuditService auditService)
+    public DocumentController(IMediator mediator, IAuditService auditService, IContributionEngine contributionEngine)
     {
         _mediator = mediator;
         _auditService = auditService;
+        _contributionEngine = contributionEngine;
     }
 
     // --- CRUD ---
@@ -61,6 +64,9 @@ public class DocumentController : ControllerBase
             await _auditService.LogAsync(
                 userId, AuditAction.DocumentEdited, "Document", id, result.Data.WorkspaceId,
                 "Edited document: " + result.Data.Title);
+            await _contributionEngine.RecordActivityAsync(
+                userId, ContributionActivity.DocumentEdited, id.ToString(),
+                result.Data.WorkspaceId);
         }
         return result.Success ? Ok(result) : BadRequest(result);
     }
@@ -110,6 +116,12 @@ public class DocumentController : ControllerBase
     public async Task<IActionResult> AddComment(Guid documentId, [FromBody] AddCommentCommand command)
     {
         var result = await _mediator.Send(command with { DocumentId = documentId });
+        if (result.Success && result.Data != null)
+        {
+            var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            await _contributionEngine.RecordActivityAsync(
+                userId, ContributionActivity.CommentAdded, result.Data.Id.ToString());
+        }
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

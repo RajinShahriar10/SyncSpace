@@ -7,6 +7,7 @@ using SyncSpace.Application.Features.Boards.DTOs;
 using SyncSpace.Application.Features.Boards.Commands;
 using SyncSpace.Application.Features.Boards.Queries;
 using SyncSpace.Domain.Enums;
+using SyncSpace.API.Services;
 
 namespace SyncSpace.API.Controllers;
 
@@ -17,11 +18,13 @@ public class BoardController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IAuditService _auditService;
+    private readonly IContributionEngine _contributionEngine;
 
-    public BoardController(IMediator mediator, IAuditService auditService)
+    public BoardController(IMediator mediator, IAuditService auditService, IContributionEngine contributionEngine)
     {
         _mediator = mediator;
         _auditService = auditService;
+        _contributionEngine = contributionEngine;
     }
 
     // --- Board CRUD ---
@@ -121,6 +124,8 @@ public class BoardController : ControllerBase
             await _auditService.LogAsync(
                 userId, AuditAction.TaskCreated, "BoardCard", result.Data.Id, null,
                 "Created task: " + result.Data.Title);
+            await _contributionEngine.RecordActivityAsync(
+                userId, ContributionActivity.TaskCreated, result.Data.Id.ToString());
         }
         return result.Success ? CreatedAtAction(nameof(Get), new { id = result.Data!.Id }, result) : BadRequest(result);
     }
@@ -206,6 +211,12 @@ public class BoardController : ControllerBase
     public async Task<IActionResult> AddCardComment([FromBody] AddCardCommentCommand command)
     {
         var result = await _mediator.Send(command);
+        if (result.Success && result.Data != null)
+        {
+            var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            await _contributionEngine.RecordActivityAsync(
+                userId, ContributionActivity.CommentAdded, result.Data.Id.ToString());
+        }
         return result.Success ? Ok(result) : BadRequest(result);
     }
 

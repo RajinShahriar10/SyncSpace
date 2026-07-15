@@ -7,6 +7,7 @@ using SyncSpace.Application.Features.Drive.DTOs;
 using SyncSpace.Application.Features.Drive.Commands;
 using SyncSpace.Application.Features.Drive.Queries;
 using SyncSpace.Domain.Enums;
+using SyncSpace.API.Services;
 
 namespace SyncSpace.API.Controllers;
 
@@ -17,11 +18,13 @@ public class FileController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IAuditService _auditService;
+    private readonly IContributionEngine _contributionEngine;
 
-    public FileController(IMediator mediator, IAuditService auditService)
+    public FileController(IMediator mediator, IAuditService auditService, IContributionEngine contributionEngine)
     {
         _mediator = mediator;
         _auditService = auditService;
+        _contributionEngine = contributionEngine;
     }
 
     // --- Upload ---
@@ -53,6 +56,9 @@ public class FileController : ControllerBase
             await _auditService.LogAsync(
                 userId, AuditAction.FileUploaded, "DriveFile", result.Data.Id, workspaceId,
                 "Uploaded file: " + file.FileName);
+            await _contributionEngine.RecordActivityAsync(
+                userId, ContributionActivity.FileUploaded, result.Data.Id.ToString(),
+                workspaceId);
         }
 
         return result.Success

@@ -93,3 +93,13 @@ public enum AcademicRole
     Student = 0,
     Instructor = 1
 }
+
+public enum ContributionActivity
+{
+    TaskCreated = 0,
+    TaskCompleted = 1,
+    DocumentEdited = 2,
+    FileUploaded = 3,
+    CommentAdded = 4,
+    MessageSent = 5
+}

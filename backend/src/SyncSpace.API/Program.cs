@@ -116,6 +116,9 @@ builder.Services.AddOpenApi();
 // SignalR
 builder.Services.AddSignalR();
 
+// Contribution Engine
+builder.Services.AddScoped<SyncSpace.API.Services.IContributionEngine, SyncSpace.API.Services.ContributionEngine>();
+
 // Health Checks
 builder.Services.AddHealthChecks()
     .AddNpgSql(

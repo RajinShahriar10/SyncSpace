@@ -5,6 +5,8 @@ using SyncSpace.Application.Common.Models;
 using SyncSpace.Application.Features.Chat.DTOs;
 using SyncSpace.Application.Features.Chat.Commands;
 using SyncSpace.Application.Features.Chat.Queries;
+using SyncSpace.Domain.Enums;
+using SyncSpace.API.Services;
 
 namespace SyncSpace.API.Controllers;
 
@@ -14,10 +16,12 @@ namespace SyncSpace.API.Controllers;
 public class ChatController : ControllerBase
 {
     private readonly IMediator _mediator;
+    private readonly IContributionEngine _contributionEngine;
 
-    public ChatController(IMediator mediator)
+    public ChatController(IMediator mediator, IContributionEngine contributionEngine)
     {
         _mediator = mediator;
+        _contributionEngine = contributionEngine;
     }
 
     // --- Channels ---
@@ -95,6 +99,12 @@ public class ChatController : ControllerBase
     public async Task<IActionResult> SendMessage(Guid channelId, [FromBody] SendMessageCommand command)
     {
         var result = await _mediator.Send(command with { ChannelId = channelId });
+        if (result.Success && result.Data != null)
+        {
+            var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            await _contributionEngine.RecordActivityAsync(
+                userId, ContributionActivity.MessageSent, result.Data.Id.ToString());
+        }
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
@@ -195,6 +205,12 @@ public class ChatController : ControllerBase
     public async Task<IActionResult> SendDirectMessage(Guid conversationId, [FromBody] SendDirectMessageCommand command)
     {
         var result = await _mediator.Send(command with { ConversationId = conversationId });
+        if (result.Success && result.Data != null)
+        {
+            var userId = Guid.Parse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)!.Value);
+            await _contributionEngine.RecordActivityAsync(
+                userId, ContributionActivity.MessageSent, result.Data.Id.ToString());
+        }
         return result.Success ? Ok(result) : BadRequest(result);
     }
 
