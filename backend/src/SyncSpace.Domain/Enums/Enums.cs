@@ -112,3 +112,19 @@ public enum MilestoneStatus
     Delayed = 3,
     Cancelled = 4
 }
+
+public enum RiskLevel
+{
+    Low = 0,
+    Medium = 1,
+    High = 2
+}
+
+public enum RiskFactor
+{
+    InactiveMembers = 0,
+    DelayedMilestones = 1,
+    LowContribution = 2,
+    CommunicationBreakdown = 3,
+    TaskBottleneck = 4
+}
