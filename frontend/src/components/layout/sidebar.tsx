@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import {
   LayoutDashboard, FileText, KanbanSquare, MessageSquare,
   Settings, Bell, Users, ChevronLeft, Plus, Activity, BarChart3, Shield,
-  BookOpen, Target, GraduationCap, Trophy,
+  BookOpen, Target, GraduationCap, Trophy, LayoutDashboardIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -18,6 +18,7 @@ const sections = [
     items: [
       { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
       { name: "Courses", href: "/courses", icon: BookOpen },
+      { name: "Instructor", href: "/instructor/dashboard", icon: Shield },
     ],
   },
   {

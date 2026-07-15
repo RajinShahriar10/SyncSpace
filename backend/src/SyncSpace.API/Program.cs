@@ -119,6 +119,9 @@ builder.Services.AddSignalR();
 // Contribution Engine
 builder.Services.AddScoped<SyncSpace.API.Services.IContributionEngine, SyncSpace.API.Services.ContributionEngine>();
 
+// Instructor Dashboard
+builder.Services.AddScoped<SyncSpace.API.Services.IInstructorDashboardService, SyncSpace.API.Services.InstructorDashboardService>();
+
 // Health Checks
 builder.Services.AddHealthChecks()
     .AddNpgSql(
