@@ -128,6 +128,9 @@ builder.Services.AddScoped<SyncSpace.API.Services.IMilestoneService, SyncSpace.A
 // Risk Detection
 builder.Services.AddScoped<SyncSpace.API.Services.IRiskDetectionService, SyncSpace.API.Services.RiskDetectionService>();
 
+// Academic Reports
+builder.Services.AddScoped<SyncSpace.API.Services.IAcademicReportService, SyncSpace.API.Services.AcademicReportService>();
+
 // Health Checks
 builder.Services.AddHealthChecks()
     .AddNpgSql(

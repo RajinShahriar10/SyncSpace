@@ -7,7 +7,7 @@ import {
   LayoutDashboard, FileText, KanbanSquare, MessageSquare,
   Settings, Bell, Users, ChevronLeft, Plus, Activity, BarChart3, Shield,
   BookOpen, Target, GraduationCap, Trophy, LayoutDashboardIcon, Milestone,
-  AlertTriangle,
+  AlertTriangle, FileBarChart,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ const sections = [
       { name: "Courses", href: "/courses", icon: BookOpen },
       { name: "Instructor", href: "/instructor/dashboard", icon: Shield },
       { name: "Risk Detection", href: "/risk/dashboard", icon: AlertTriangle },
+      { name: "Reports", href: "/reports", icon: FileBarChart },
     ],
   },
   {
