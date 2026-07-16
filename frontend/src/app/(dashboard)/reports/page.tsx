@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
@@ -78,6 +78,11 @@ export default function ReportsPage() {
   const [idError, setIdError] = useState("")
   const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+
+  useEffect(() => {
+    const stored = localStorage.getItem("studentId");
+    if (stored) setSearchId(stored);
+  }, []);
 
   const handleNavigate = (href: string) => {
     if (searchId.trim()) {

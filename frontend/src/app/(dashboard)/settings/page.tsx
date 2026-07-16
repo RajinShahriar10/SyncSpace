@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -18,17 +18,28 @@ export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
+  const [studentId, setStudentId] = useState("");
+  const [prevStudentId, setPrevStudentId] = useState("");
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("studentId") || "";
+    setStudentId(stored);
+    setPrevStudentId(stored);
+    setMounted(true);
+  }, []);
 
   const handleSave = async () => {
     setSaving(true);
-    // Simulate save (no backend endpoint for profile update yet)
+    localStorage.setItem("studentId", studentId);
+    setPrevStudentId(studentId);
     await new Promise((r) => setTimeout(r, 800));
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
 
-  const hasChanges = firstName !== (user?.firstName || "") || lastName !== (user?.lastName || "");
+  const hasChanges = firstName !== (user?.firstName || "") || lastName !== (user?.lastName || "") || studentId !== prevStudentId;
 
   return (
     <DashboardLayout>
@@ -99,6 +110,16 @@ export default function SettingsPage() {
                   className="h-11 opacity-60"
                 />
                 <p className="text-xs text-muted-foreground">Email is managed by your GitHub account</p>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-muted-foreground">Student ID</label>
+                <Input
+                  value={studentId}
+                  onChange={(e) => setStudentId(e.target.value)}
+                  placeholder="e.g. STU-2024-001"
+                  className="h-11"
+                />
+                <p className="text-xs text-muted-foreground">Used to auto-fill report lookups</p>
               </div>
               <div className="flex justify-end pt-2">
                 <Button
