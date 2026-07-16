@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SyncSpace.API.Services;
+using SyncSpace.Application.Common.Models;
 
 namespace SyncSpace.API.Controllers;
 
@@ -17,79 +18,79 @@ public class AcademicReportController : ControllerBase
     }
 
     [HttpGet("student/{userId:guid}")]
-    public async Task<ActionResult<StudentReportDto>> GetStudentReport(Guid userId, [FromQuery] Guid? courseId = null)
+    public async Task<ActionResult<ApiResponse<StudentReportDto>>> GetStudentReport(Guid userId, [FromQuery] Guid? courseId = null)
     {
         try
         {
             var report = await _reportService.GetStudentReportAsync(userId, courseId);
-            return Ok(report);
+            return Ok(ApiResponse<StudentReportDto>.SuccessResponse(report));
         }
         catch (ArgumentException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(ApiResponse<StudentReportDto>.NotFound(ex.Message));
         }
     }
 
     [HttpGet("student/{userId:guid}/activity-trend")]
-    public async Task<ActionResult<StudentActivityTrendDto[]>> GetStudentActivityTrend(Guid userId, [FromQuery] int weeks = 12)
+    public async Task<ActionResult<ApiResponse<StudentActivityTrendDto[]>>> GetStudentActivityTrend(Guid userId, [FromQuery] int weeks = 12)
     {
         var trend = await _reportService.GetStudentActivityTrendAsync(userId, weeks);
-        return Ok(trend);
+        return Ok(ApiResponse<StudentActivityTrendDto[]>.SuccessResponse(trend));
     }
 
     [HttpGet("group/{projectGroupId:guid}")]
-    public async Task<ActionResult<GroupReportDto>> GetGroupReport(Guid projectGroupId)
+    public async Task<ActionResult<ApiResponse<GroupReportDto>>> GetGroupReport(Guid projectGroupId)
     {
         try
         {
             var report = await _reportService.GetGroupReportAsync(projectGroupId);
-            return Ok(report);
+            return Ok(ApiResponse<GroupReportDto>.SuccessResponse(report));
         }
         catch (ArgumentException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(ApiResponse<GroupReportDto>.NotFound(ex.Message));
         }
     }
 
     [HttpGet("instructor/{courseId:guid}")]
-    public async Task<ActionResult<InstructorReportDto>> GetInstructorReport(Guid courseId)
+    public async Task<ActionResult<ApiResponse<InstructorReportDto>>> GetInstructorReport(Guid courseId)
     {
         try
         {
             var report = await _reportService.GetInstructorReportAsync(courseId);
-            return Ok(report);
+            return Ok(ApiResponse<InstructorReportDto>.SuccessResponse(report));
         }
         catch (ArgumentException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(ApiResponse<InstructorReportDto>.NotFound(ex.Message));
         }
     }
 
     [HttpGet("semester/{courseId:guid}")]
-    public async Task<ActionResult<SemesterSummaryDto>> GetSemesterSummary(Guid courseId)
+    public async Task<ActionResult<ApiResponse<SemesterSummaryDto>>> GetSemesterSummary(Guid courseId)
     {
         try
         {
             var summary = await _reportService.GetSemesterSummaryAsync(courseId);
-            return Ok(summary);
+            return Ok(ApiResponse<SemesterSummaryDto>.SuccessResponse(summary));
         }
         catch (ArgumentException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(ApiResponse<SemesterSummaryDto>.NotFound(ex.Message));
         }
     }
 
     [HttpGet("rankings/{courseId:guid}")]
-    public async Task<ActionResult<GroupRankingDto[]>> GetGroupRankings(Guid courseId)
+    public async Task<ActionResult<ApiResponse<GroupRankingDto[]>>> GetGroupRankings(Guid courseId)
     {
         var rankings = await _reportService.GetGroupRankingsAsync(courseId);
-        return Ok(rankings);
+        return Ok(ApiResponse<GroupRankingDto[]>.SuccessResponse(rankings));
     }
 
     [HttpGet("stats/{courseId:guid}")]
-    public async Task<ActionResult<CourseStatsDto>> GetCourseStats(Guid courseId)
+    public async Task<ActionResult<ApiResponse<CourseStatsDto>>> GetCourseStats(Guid courseId)
     {
         var stats = await _reportService.GetCourseStatsAsync(courseId);
-        return Ok(stats);
+        return Ok(ApiResponse<CourseStatsDto>.SuccessResponse(stats));
     }
 }

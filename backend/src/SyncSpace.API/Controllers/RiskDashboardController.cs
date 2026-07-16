@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SyncSpace.API.Services;
+using SyncSpace.Application.Common.Models;
 using SyncSpace.Domain.Enums;
 
 namespace SyncSpace.API.Controllers;
@@ -18,70 +19,70 @@ public class RiskDashboardController : ControllerBase
     }
 
     [HttpGet("dashboard")]
-    public async Task<ActionResult<RiskDashboardDto>> GetDashboard([FromQuery] Guid? courseId = null)
+    public async Task<ActionResult<ApiResponse<RiskDashboardDto>>> GetDashboard([FromQuery] Guid? courseId = null)
     {
         var dashboard = await _riskService.GetDashboardAsync(courseId);
-        return Ok(dashboard);
+        return Ok(ApiResponse<RiskDashboardDto>.SuccessResponse(dashboard));
     }
 
     [HttpGet("assessments")]
-    public async Task<ActionResult<RiskAssessmentDto[]>> GetAssessments(
+    public async Task<ActionResult<ApiResponse<RiskAssessmentDto[]>>> GetAssessments(
         [FromQuery] Guid? courseId = null,
         [FromQuery] RiskLevel? riskLevel = null)
     {
         var assessments = await _riskService.GetAllAssessmentsAsync(courseId, riskLevel);
-        return Ok(assessments);
+        return Ok(ApiResponse<RiskAssessmentDto[]>.SuccessResponse(assessments));
     }
 
     [HttpPost("assess/{projectGroupId:guid}")]
-    public async Task<ActionResult<RiskAssessmentDto>> AssessGroup(Guid projectGroupId)
+    public async Task<ActionResult<ApiResponse<RiskAssessmentDto>>> AssessGroup(Guid projectGroupId)
     {
         try
         {
             var assessment = await _riskService.AssessGroupRiskAsync(projectGroupId);
-            return Ok(assessment);
+            return Ok(ApiResponse<RiskAssessmentDto>.SuccessResponse(assessment));
         }
         catch (ArgumentException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(ApiResponse<RiskAssessmentDto>.NotFound(ex.Message));
         }
     }
 
     [HttpGet("alerts")]
-    public async Task<ActionResult<RiskAlertDto[]>> GetAlerts(
+    public async Task<ActionResult<ApiResponse<RiskAlertDto[]>>> GetAlerts(
         [FromQuery] Guid? courseId = null,
         [FromQuery] RiskLevel? severity = null,
         [FromQuery] bool? acknowledged = null)
     {
         var alerts = await _riskService.GetAlertsAsync(courseId, severity, acknowledged);
-        return Ok(alerts);
+        return Ok(ApiResponse<RiskAlertDto[]>.SuccessResponse(alerts));
     }
 
     [HttpPost("alerts/{alertId:guid}/acknowledge")]
     public async Task<IActionResult> AcknowledgeAlert(Guid alertId, [FromQuery] Guid userId)
     {
         var success = await _riskService.AcknowledgeAlertAsync(alertId, userId);
-        return success ? Ok(new { message = "Alert acknowledged" }) : NotFound();
+        return success ? Ok(ApiResponse<object>.SuccessResponse(new { message = "Alert acknowledged" })) : NotFound();
     }
 
     [HttpGet("group/{projectGroupId:guid}")]
-    public async Task<ActionResult<GroupRiskDetailDto>> GetGroupDetail(Guid projectGroupId)
+    public async Task<ActionResult<ApiResponse<GroupRiskDetailDto>>> GetGroupDetail(Guid projectGroupId)
     {
         try
         {
             var detail = await _riskService.GetGroupDetailAsync(projectGroupId);
-            return Ok(detail);
+            return Ok(ApiResponse<GroupRiskDetailDto>.SuccessResponse(detail));
         }
         catch (ArgumentException ex)
         {
-            return NotFound(ex.Message);
+            return NotFound(ApiResponse<GroupRiskDetailDto>.NotFound(ex.Message));
         }
     }
 
     [HttpGet("auto-refresh")]
-    public async Task<ActionResult<AutoRefreshPayload>> GetAutoRefresh([FromQuery] DateTime? since = null)
+    public async Task<ActionResult<ApiResponse<AutoRefreshPayload>>> GetAutoRefresh([FromQuery] DateTime? since = null)
     {
         var payload = await _riskService.GetAutoRefreshAsync(since);
-        return Ok(payload);
+        return Ok(ApiResponse<AutoRefreshPayload>.SuccessResponse(payload));
     }
 }
