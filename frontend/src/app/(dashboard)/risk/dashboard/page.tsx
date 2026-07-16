@@ -139,7 +139,7 @@ export default function RiskDashboardPage() {
                 <p className="text-sm font-medium">Overall Health Score</p>
                 <p className="text-lg font-bold text-primary">{dashboard?.overallHealth ?? 0}%</p>
               </div>
-              <div className="h-3 rounded-full bg-white/5 overflow-hidden">
+              <div className="h-3 rounded-full bg-surface-sunken overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${dashboard?.overallHealth ?? 0}%` }}
@@ -174,7 +174,7 @@ export default function RiskDashboardPage() {
 
         {/* Tabs */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
-          <div className="flex gap-1 mb-4 border-b border-white/10">
+          <div className="flex gap-1 mb-4 border-b border-border-subtle">
             {(["overview", "groups", "alerts"] as const).map((tab) => (
               <button
                 key={tab}
@@ -214,7 +214,7 @@ export default function RiskDashboardPage() {
                             <span className={`text-xs font-medium ${config.color}`}>{level}</span>
                             <span className="text-xs text-muted-foreground ml-auto">{count}</span>
                           </div>
-                          <div className="h-2 rounded-full bg-white/5 overflow-hidden">
+                          <div className="h-2 rounded-full bg-surface-sunken overflow-hidden">
                             <motion.div
                               initial={{ width: 0 }}
                               animate={{ width: `${percent}%` }}
@@ -290,7 +290,7 @@ export default function RiskDashboardPage() {
                     className={`text-xs px-2.5 py-1 rounded-full transition-colors ${
                       filterRiskLevel === f.value
                         ? "bg-primary/20 text-primary"
-                        : "bg-white/5 text-muted-foreground hover:bg-white/10"
+                        : "bg-surface-sunken text-muted-foreground hover:bg-surface-hover"
                     }`}
                   >
                     {f.label}
@@ -310,7 +310,7 @@ export default function RiskDashboardPage() {
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.03 * i }}
                     >
-                      <Card className={`cursor-pointer transition-all hover:bg-white/[0.07] ${config.border} border`} onClick={() => router.push(`/risk/group/${a.projectGroupId}`)}>
+                      <Card className={`cursor-pointer transition-all hover:bg-surface-hover ${config.border} border`} onClick={() => router.push(`/risk/group/${a.projectGroupId}`)}>
                         <CardContent className="p-4">
                           <div className="flex items-center gap-4">
                             {/* Risk Score Ring */}
@@ -356,7 +356,7 @@ export default function RiskDashboardPage() {
                                 const percent = Math.round((score as number) / maxScore * 100);
                                 return (
                                   <div key={key} className="text-center">
-                                    <div className="h-8 w-1.5 rounded-full bg-white/5 overflow-hidden">
+                                    <div className="h-8 w-1.5 rounded-full bg-surface-sunken overflow-hidden">
                                       <motion.div
                                         initial={{ height: 0 }}
                                         animate={{ height: `${percent}%` }}
@@ -402,7 +402,7 @@ export default function RiskDashboardPage() {
                   <button
                     key={level}
                     onClick={() => fetchAlerts(undefined, level === "All" ? undefined : level, false)}
-                    className="text-xs px-2.5 py-1 rounded-full bg-white/5 text-muted-foreground hover:bg-white/10 transition-colors"
+                    className="text-xs px-2.5 py-1 rounded-full bg-surface-sunken text-muted-foreground hover:bg-surface-hover transition-colors"
                   >
                     {level}
                   </button>
@@ -433,7 +433,7 @@ export default function RiskDashboardPage() {
                                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${config.bg} ${config.color}`}>
                                   {alert.severity}
                                 </span>
-                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-white/5 text-muted-foreground">
+                                <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-surface-sunken text-muted-foreground">
                                   {factorLabels[alert.factor] || alert.factor}
                                 </span>
                               </div>

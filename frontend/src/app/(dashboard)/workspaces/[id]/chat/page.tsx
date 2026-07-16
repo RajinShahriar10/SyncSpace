@@ -43,7 +43,7 @@ export default function ChatPage() {
     conn.start().then(() => {
       connectionRef.current = conn;
       setConnection(conn);
-    }).catch(console.error);
+    }).catch(() => {});
 
     return () => {
       conn.stop().catch(() => {});

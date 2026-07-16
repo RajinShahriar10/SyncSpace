@@ -30,7 +30,9 @@ export function useNotificationHub(userId: string | undefined) {
 
     conn.start()
       .then(() => { connectionRef.current = conn; })
-      .catch(console.error);
+      .catch(() => {
+        // Backend not available — will retry on reconnect
+      });
 
     return () => {
       conn.stop().catch(() => {});

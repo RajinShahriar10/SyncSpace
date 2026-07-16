@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion } from "framer-motion"
 import {
@@ -75,11 +75,17 @@ const reportTypes = [
 
 export default function ReportsPage() {
   const [searchId, setSearchId] = useState("")
+  const [idError, setIdError] = useState("")
+  const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
 
   const handleNavigate = (href: string) => {
     if (searchId.trim()) {
+      setIdError("")
       router.push(`${href}${searchId}`)
+    } else {
+      setIdError("Enter an ID above first")
+      inputRef.current?.focus()
     }
   }
 
@@ -119,11 +125,15 @@ export default function ReportsPage() {
                 <div className="relative flex-1">
                   <GraduationCap className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
+                    ref={inputRef}
                     placeholder="Enter Course ID or Student ID..."
                     value={searchId}
-                    onChange={(e) => setSearchId(e.target.value)}
-                    className="pl-10 bg-surface-sunken border-border-subtle text-foreground placeholder:text-muted-foreground focus:border-indigo-500/50 focus:ring-indigo-500/20"
+                    onChange={(e) => { setSearchId(e.target.value); setIdError("") }}
+                    className="pl-10 bg-surface-sunken border-border-subtle text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/20"
                   />
+                  {idError && (
+                    <p className="text-xs text-amber-400 mt-1.5">{idError}</p>
+                  )}
                 </div>
                 <Button
                   variant="outline"

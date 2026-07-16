@@ -120,7 +120,7 @@ export const useRiskStore = create<RiskState>((set, get) => ({
     const { lastRefresh } = get();
     try {
       const payload = await riskApi.getAutoRefresh(lastRefresh || undefined);
-      if (payload.assessments.length > 0) {
+      if (payload?.assessments?.length > 0) {
         set((state) => ({
           assessments: state.assessments.map((a) => {
             const updated = payload.assessments.find((u) => u.projectGroupId === a.projectGroupId);
