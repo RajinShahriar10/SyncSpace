@@ -37,6 +37,7 @@ export default function CoursesPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [createError, setCreateError] = useState("");
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<CreateFormData>({
     resolver: zodResolver(createSchema),
@@ -46,12 +47,16 @@ export default function CoursesPage() {
 
   const onCreate = async (data: CreateFormData) => {
     setCreating(true);
+    setCreateError("");
     try {
       const course = await createCourse(data);
       reset();
       setShowCreate(false);
       router.push(`/courses/${course.id}`);
-    } catch {} finally { setCreating(false); }
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || "Failed to create course. Please try again.";
+      setCreateError(typeof msg === "string" ? msg : "Failed to create course.");
+    } finally { setCreating(false); }
   };
 
   const filtered = courses.filter((c) =>
@@ -100,8 +105,13 @@ export default function CoursesPage() {
                       <Button type="submit" disabled={creating} className="gap-2">
                         {creating ? <><div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" /> Creating...</> : <><Plus className="h-4 w-4" /> Create</>}
                       </Button>
-                      <Button variant="ghost" onClick={() => setShowCreate(false)} type="button">Cancel</Button>
+                      <Button variant="ghost" onClick={() => { setShowCreate(false); setCreateError(""); }} type="button">Cancel</Button>
                     </div>
+                    {createError && (
+                      <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+                        {createError}
+                      </div>
+                    )}
                   </form>
                 </CardContent>
               </Card>

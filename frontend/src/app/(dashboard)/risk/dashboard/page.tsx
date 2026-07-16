@@ -64,7 +64,7 @@ export default function RiskDashboardPage() {
   }, []);
 
   const handleAssessAll = async () => {
-    for (const a of assessments) {
+    for (const a of (assessments || [])) {
       try { await runAssessment(a.projectGroupId); } catch {}
     }
     fetchDashboard();
@@ -73,8 +73,8 @@ export default function RiskDashboardPage() {
   };
 
   const filteredAssessments = filterRiskLevel
-    ? assessments.filter((a) => a.riskLevel === filterRiskLevel)
-    : assessments;
+    ? (assessments || []).filter((a) => a.riskLevel === filterRiskLevel)
+    : (assessments || []);
 
   const highRisk = filteredAssessments.filter((a) => a.riskLevel === "High");
   const mediumRisk = filteredAssessments.filter((a) => a.riskLevel === "Medium");
@@ -382,7 +382,7 @@ export default function RiskDashboardPage() {
                   <Card>
                     <CardContent className="p-8 text-center">
                       <Shield className="h-8 w-8 text-muted-foreground/30 mx-auto mb-3" />
-                      <p className="text-sm text-muted-foreground">No risk assessments found</p>
+                      <p className="text-sm text-muted-foreground">No risk (assessments || []) found</p>
                       <p className="text-xs text-muted-foreground/60 mt-1">Click &quot;Assess All&quot; to run risk analysis</p>
                     </CardContent>
                   </Card>

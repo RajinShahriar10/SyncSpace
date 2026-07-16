@@ -101,7 +101,7 @@ export default function SemesterSummaryPage() {
       { Field: "Total Contribution Score", Value: semesterSummary.stats.totalContributionScore },
     ];
 
-    const topPerformersData = semesterSummary.topPerformers.map((p, i) => ({
+    const topPerformersData = (semesterSummary.topPerformers || []).map((p, i) => ({
       Rank: i + 1,
       Name: p.fullName,
       "Total Score": p.totalScore,
@@ -109,7 +109,7 @@ export default function SemesterSummaryPage() {
       Group: p.groupName,
     }));
 
-    const groupRankingsData = semesterSummary.groupRankings.map((g) => ({
+    const groupRankingsData = (semesterSummary.groupRankings || []).map((g) => ({
       Rank: g.rank,
       "Group Name": g.groupName,
       Members: g.memberCount,
@@ -120,17 +120,17 @@ export default function SemesterSummaryPage() {
       "Milestone %": g.milestonePercent,
     }));
 
-    const activityData = semesterSummary.activityTrend.map((a) => ({
+    const activityData = (semesterSummary.activityTrend || []).map((a) => ({
       Week: a.label,
       Activity: a.score,
     }));
 
     const contributionData = [
-      { Type: "Tasks", Count: semesterSummary.contributionBreakdown.tasksCompleted },
-      { Type: "Documents", Count: semesterSummary.contributionBreakdown.documentsEdited },
-      { Type: "Files", Count: semesterSummary.contributionBreakdown.filesUploaded },
-      { Type: "Comments", Count: semesterSummary.contributionBreakdown.commentsAdded },
-      { Type: "Messages", Count: semesterSummary.contributionBreakdown.messagesSent },
+      { Type: "Tasks", Count: (semesterSummary.contributionBreakdown || {}).tasksCompleted },
+      { Type: "Documents", Count: (semesterSummary.contributionBreakdown || {}).documentsEdited },
+      { Type: "Files", Count: (semesterSummary.contributionBreakdown || {}).filesUploaded },
+      { Type: "Comments", Count: (semesterSummary.contributionBreakdown || {}).commentsAdded },
+      { Type: "Messages", Count: (semesterSummary.contributionBreakdown || {}).messagesSent },
     ];
 
     const wb = require("xlsx");
@@ -168,15 +168,15 @@ export default function SemesterSummaryPage() {
   const { stats } = report;
 
   const contributionPieData = [
-    { name: "Tasks", value: report.contributionBreakdown.tasksCompleted },
-    { name: "Documents", value: report.contributionBreakdown.documentsEdited },
-    { name: "Files", value: report.contributionBreakdown.filesUploaded },
-    { name: "Comments", value: report.contributionBreakdown.commentsAdded },
-    { name: "Messages", value: report.contributionBreakdown.messagesSent },
+    { name: "Tasks", value: (report.contributionBreakdown || {}).tasksCompleted },
+    { name: "Documents", value: (report.contributionBreakdown || {}).documentsEdited },
+    { name: "Files", value: (report.contributionBreakdown || {}).filesUploaded },
+    { name: "Comments", value: (report.contributionBreakdown || {}).commentsAdded },
+    { name: "Messages", value: (report.contributionBreakdown || {}).messagesSent },
   ];
 
-  const top3 = report.topPerformers.slice(0, 3);
-  const restPerformers = report.topPerformers.slice(3);
+  const top3 = (report.topPerformers || []).slice(0, 3);
+  const restPerformers = (report.topPerformers || []).slice(3);
 
   const milestoneCompletionRate = stats.totalMilestones > 0
     ? Math.round((stats.completedMilestones / stats.totalMilestones) * 100)
@@ -191,7 +191,7 @@ export default function SemesterSummaryPage() {
 
   const performanceDistribution = performanceRanges.map((r) => ({
     range: r.range,
-    count: report.topPerformers.filter(
+    count: (report.topPerformers || []).filter(
       (p) => p.totalScore >= r.min && p.totalScore < r.max
     ).length + (r.max === Infinity
       ? 0
@@ -199,7 +199,7 @@ export default function SemesterSummaryPage() {
     color: r.color,
   }));
 
-  const allStudentScores = report.groupRankings.reduce(
+  const allStudentScores = (report.groupRankings || []).reduce(
     (acc, g) => acc + g.memberCount,
     0
   );
@@ -211,12 +211,12 @@ export default function SemesterSummaryPage() {
         ? Math.max(0, stats.totalStudents - performanceRanges.slice(0, -1).reduce(
             (sum, pr) =>
               sum +
-              report.topPerformers.filter(
+              (report.topPerformers || []).filter(
                 (p) => p.totalScore >= pr.min && p.totalScore < pr.max
               ).length,
             0
           ))
-        : report.topPerformers.filter(
+        : (report.topPerformers || []).filter(
             (p) => p.totalScore >= r.min && p.totalScore < r.max
           ).length,
     color: r.color,
@@ -474,7 +474,7 @@ export default function SemesterSummaryPage() {
                 )}
 
                 {/* Full Performers Table */}
-                {report.topPerformers.length > 0 && (
+                {(report.topPerformers || []).length > 0 && (
                   <div className="overflow-x-auto">
                     <table className="w-full text-sm">
                       <thead>
@@ -487,7 +487,7 @@ export default function SemesterSummaryPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-800/60">
-                        {report.topPerformers.map((performer, index) => (
+                        {(report.topPerformers || []).map((performer, index) => (
                           <tr key={performer.userId} className="hover:bg-white/[0.02]">
                             <td className="py-3">
                               <div className="flex items-center gap-2">
@@ -542,11 +542,11 @@ export default function SemesterSummaryPage() {
                   Group Rankings
                 </CardTitle>
                 <p className="text-xs text-zinc-500">
-                  {report.groupRankings.length} group{report.groupRankings.length !== 1 ? "s" : ""} ranked by total score
+                  {(report.groupRankings || []).length} group{(report.groupRankings || []).length !== 1 ? "s" : ""} ranked by total score
                 </p>
               </CardHeader>
               <CardContent className="space-y-6">
-                {report.groupRankings.length === 0 ? (
+                {(report.groupRankings || []).length === 0 ? (
                   <p className="py-8 text-center text-sm text-zinc-500">
                     No group rankings available.
                   </p>
@@ -555,7 +555,7 @@ export default function SemesterSummaryPage() {
                     {/* Bar Chart */}
                     <div className="h-64">
                       <ResponsiveContainer width="100%" height="100%">
-                        <BarChart data={report.groupRankings}>
+                        <BarChart data={(report.groupRankings || [])}>
                           <CartesianGrid strokeDasharray="3 3" stroke="#27272a" />
                           <XAxis
                             dataKey="groupName"
@@ -580,7 +580,7 @@ export default function SemesterSummaryPage() {
                             cursor={{ fill: "rgba(255,255,255,0.03)" }}
                           />
                           <Bar dataKey="totalScore" name="Total Score" radius={[4, 4, 0, 0]}>
-                            {report.groupRankings.map((_entry, index) => (
+                            {(report.groupRankings || []).map((_entry, index) => (
                               <Cell
                                 key={`cell-${index}`}
                                 fill={PIE_COLORS[index % PIE_COLORS.length]}
@@ -605,7 +605,7 @@ export default function SemesterSummaryPage() {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-zinc-800/60">
-                          {report.groupRankings.map((group) => (
+                          {(report.groupRankings || []).map((group) => (
                             <tr key={group.projectGroupId} className="hover:bg-white/[0.02]">
                               <td className="py-3">
                                 <div className="flex items-center gap-2">
@@ -674,7 +674,7 @@ export default function SemesterSummaryPage() {
                 <CardContent>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={report.activityTrend}>
+                      <AreaChart data={(report.activityTrend || [])}>
                         <defs>
                           <linearGradient id="semesterActivityGradient" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3} />
@@ -808,12 +808,12 @@ export default function SemesterSummaryPage() {
                       ? stats.totalStudents - performanceRanges.slice(0, -1).reduce(
                           (sum, pr) =>
                             sum +
-                            report.topPerformers.filter(
+                            (report.topPerformers || []).filter(
                               (p) => p.totalScore >= pr.min && p.totalScore < pr.max
                             ).length,
                           0
                         )
-                      : report.topPerformers.filter(
+                      : (report.topPerformers || []).filter(
                           (p) => p.totalScore >= range.min && p.totalScore < range.max
                         ).length;
 

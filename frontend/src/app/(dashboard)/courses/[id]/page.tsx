@@ -53,8 +53,8 @@ export default function CourseDetailPage() {
     setShowCreateMilestone(false);
   };
 
-  const completedMilestones = milestones.filter((m) => m.isCompleted).length;
-  const upcomingMilestones = milestones.filter((m) => !m.isCompleted && new Date(m.dueDate) > new Date()).length;
+  const completedMilestones = (milestones || []).filter((m) => m.isCompleted).length;
+  const upcomingMilestones = (milestones || []).filter((m) => !m.isCompleted && new Date(m.dueDate) > new Date()).length;
 
   return (
     <DashboardLayout>
@@ -76,8 +76,8 @@ export default function CourseDetailPage() {
 
         {/* Stats */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <Card><CardContent className="p-4 text-center"><Users className="h-5 w-5 text-emerald-400 mx-auto mb-2" /><p className="text-2xl font-bold">{groups.length}</p><p className="text-xs text-muted-foreground">Groups</p></CardContent></Card>
-          <Card><CardContent className="p-4 text-center"><LayoutGrid className="h-5 w-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{groups.reduce((s, g) => s + g.workspaceCount, 0)}</p><p className="text-xs text-muted-foreground">Projects</p></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><Users className="h-5 w-5 text-emerald-400 mx-auto mb-2" /><p className="text-2xl font-bold">{(groups || []).length}</p><p className="text-xs text-muted-foreground">Groups</p></CardContent></Card>
+          <Card><CardContent className="p-4 text-center"><LayoutGrid className="h-5 w-5 text-primary mx-auto mb-2" /><p className="text-2xl font-bold">{(groups || []).reduce((s, g) => s + g.workspaceCount, 0)}</p><p className="text-xs text-muted-foreground">Projects</p></CardContent></Card>
           <Card><CardContent className="p-4 text-center"><CheckCircle2 className="h-5 w-5 text-emerald-400 mx-auto mb-2" /><p className="text-2xl font-bold">{completedMilestones}</p><p className="text-xs text-muted-foreground">Completed</p></CardContent></Card>
           <Card><CardContent className="p-4 text-center"><Clock className="h-5 w-5 text-amber-400 mx-auto mb-2" /><p className="text-2xl font-bold">{upcomingMilestones}</p><p className="text-xs text-muted-foreground">Upcoming</p></CardContent></Card>
         </motion.div>
@@ -99,7 +99,7 @@ export default function CourseDetailPage() {
               </CardContent></Card>
             )}
             <div className="space-y-2">
-              {groups.map((group) => (
+              {(groups || []).map((group) => (
                 <Card key={group.id} className={`cursor-pointer transition-all hover:bg-white/[0.07] ${selectedGroup === group.id ? "ring-1 ring-primary/30" : ""}`} onClick={() => { setSelectedGroup(group.id); setShowCreateMilestone(false); }}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
@@ -114,7 +114,7 @@ export default function CourseDetailPage() {
                   </CardContent>
                 </Card>
               ))}
-              {groups.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No groups yet. Create one to get started.</p>}
+              {(groups || []).length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No groups yet. Create one to get started.</p>}
             </div>
           </motion.div>
 
@@ -149,7 +149,7 @@ export default function CourseDetailPage() {
               </CardContent></Card>
             ) : (
               <div className="space-y-2">
-                {milestones.map((m) => (
+                {(milestones || []).map((m) => (
                   <Card key={m.id} className={`cursor-pointer transition-all hover:bg-white/[0.07] ${m.isCompleted ? "opacity-60" : ""}`} onClick={() => router.push(`/milestones/${m.id}`)}>
                     <CardContent className="p-3">
                       <div className="flex items-start justify-between gap-2">
@@ -174,7 +174,7 @@ export default function CourseDetailPage() {
                     </CardContent>
                   </Card>
                 ))}
-                {milestones.length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No milestones yet</p>}
+                {(milestones || []).length === 0 && <p className="text-sm text-muted-foreground text-center py-8">No milestones yet</p>}
               </div>
             )}
           </motion.div>

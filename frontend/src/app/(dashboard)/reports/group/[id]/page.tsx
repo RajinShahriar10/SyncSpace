@@ -129,7 +129,7 @@ export default function GroupReportPage() {
       ["Milestone Completion %", groupReport.progress.milestoneCompletionPercent],
       [],
       ["Member", "Role", "Score", "Tasks", "Docs", "Files", "Contribution %"],
-      ...groupReport.members.map((m) => [
+      ...(groupReport.members || []).map((m) => [
         m.fullName,
         m.isLeader ? "Leader" : "Member",
         m.totalScore,
@@ -167,12 +167,12 @@ export default function GroupReportPage() {
   const { progress } = report;
   const risk = report.riskSummary;
 
-  const barData = report.contributionDistribution.map((d) => ({
+  const barData = (report.contributionDistribution || []).map((d) => ({
     name: d.name.split(" ")[0],
     score: d.score,
   }));
 
-  const activityData = report.activityTrend.map((a) => ({
+  const activityData = (report.activityTrend || []).map((a) => ({
     week: a.label,
     score: a.score,
   }));
@@ -389,7 +389,7 @@ export default function GroupReportPage() {
                   Member Details
                 </CardTitle>
                 <p className="text-xs text-zinc-500">
-                  {report.members.length} member{report.members.length !== 1 ? "s" : ""} in this group
+                  {(report.members || []).length} member{(report.members || []).length !== 1 ? "s" : ""} in this group
                 </p>
               </CardHeader>
               <CardContent>
@@ -407,7 +407,7 @@ export default function GroupReportPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-zinc-800/60">
-                      {report.members.map((member) => (
+                      {(report.members || []).map((member) => (
                         <tr key={member.userId} className="hover:bg-white/[0.02]">
                           <td className="py-3 text-zinc-200">{member.fullName}</td>
                           <td className="py-3">
@@ -469,9 +469,9 @@ export default function GroupReportPage() {
 
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     {[
-                      { label: "Inactive Members", value: risk.inactiveMembers, max: report.members.length || 1 },
+                      { label: "Inactive Members", value: risk.inactiveMembers, max: (report.members || []).length || 1 },
                       { label: "Delayed Milestones", value: risk.delayedMilestones, max: progress.totalMilestones || 1 },
-                      { label: "Low Contribution", value: risk.lowContribution, max: report.members.length || 1 },
+                      { label: "Low Contribution", value: risk.lowContribution, max: (report.members || []).length || 1 },
                       { label: "Communication Issues", value: risk.communication, max: 10 },
                       { label: "Task Bottleneck", value: risk.taskBottleneck, max: progress.totalTasks || 1 },
                     ].map((factor) => {

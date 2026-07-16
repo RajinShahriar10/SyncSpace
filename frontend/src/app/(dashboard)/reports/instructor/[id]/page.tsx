@@ -86,7 +86,7 @@ export default function InstructorReportPage() {
   const handleExportExcel = () => {
     if (!instructorReport) return;
 
-    const rankingsData = instructorReport.groupRankings.map((g) => ({
+    const rankingsData = (instructorReport.groupRankings || []).map((g) => ({
       Rank: g.rank,
       "Group Name": g.groupName,
       Members: g.memberCount,
@@ -133,11 +133,11 @@ export default function InstructorReportPage() {
   const { stats } = report;
 
   const contributionPieData = [
-    { name: "Tasks", value: report.contributionBreakdown.tasksCompleted },
-    { name: "Documents", value: report.contributionBreakdown.documentsEdited },
-    { name: "Files", value: report.contributionBreakdown.filesUploaded },
-    { name: "Comments", value: report.contributionBreakdown.commentsAdded },
-    { name: "Messages", value: report.contributionBreakdown.messagesSent },
+    { name: "Tasks", value: (report.contributionBreakdown || {}).tasksCompleted },
+    { name: "Documents", value: (report.contributionBreakdown || {}).documentsEdited },
+    { name: "Files", value: (report.contributionBreakdown || {}).filesUploaded },
+    { name: "Comments", value: (report.contributionBreakdown || {}).commentsAdded },
+    { name: "Messages", value: (report.contributionBreakdown || {}).messagesSent },
   ];
 
   const participationRate = stats.participationRate;
@@ -301,11 +301,11 @@ export default function InstructorReportPage() {
                   Group Rankings
                 </CardTitle>
                 <p className="text-xs text-zinc-500">
-                  {report.groupRankings.length} group{report.groupRankings.length !== 1 ? "s" : ""} ranked by total score
+                  {(report.groupRankings || []).length} group{(report.groupRankings || []).length !== 1 ? "s" : ""} ranked by total score
                 </p>
               </CardHeader>
               <CardContent>
-                {report.groupRankings.length === 0 ? (
+                {(report.groupRankings || []).length === 0 ? (
                   <p className="py-8 text-center text-sm text-zinc-500">
                     No group rankings available.
                   </p>
@@ -323,7 +323,7 @@ export default function InstructorReportPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-zinc-800/60">
-                        {report.groupRankings.map((group) => (
+                        {(report.groupRankings || []).map((group) => (
                           <tr key={group.projectGroupId} className="hover:bg-white/[0.02]">
                             <td className="py-3">
                               <div className="flex items-center gap-2">
@@ -399,7 +399,7 @@ export default function InstructorReportPage() {
                 <CardContent>
                   <div className="h-64">
                     <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={report.activityTrend}>
+                      <AreaChart data={(report.activityTrend || [])}>
                         <defs>
                           <linearGradient id="instructorActivityGradient" x1="0" y1="0" x2="0" y2="1">
                             <stop offset="5%" stopColor={COLORS.primary} stopOpacity={0.3} />

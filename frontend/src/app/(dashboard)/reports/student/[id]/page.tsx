@@ -132,19 +132,19 @@ export default function StudentReportPage() {
   const report = studentReport;
   const summary = report.summary;
 
-  const activityData = report.activityTrend.map((a) => ({
+  const activityData = (report.activityTrend || []).map((a) => ({
     week: a.label,
     score: a.score,
     tasks: a.tasksCompleted,
   }));
 
   const breakdownData = [
-    { name: "Tasks Completed", value: report.contributionBreakdown.taskCompleted },
-    { name: "Tasks Created", value: report.contributionBreakdown.taskCreated },
-    { name: "Documents Edited", value: report.contributionBreakdown.documentEdited },
-    { name: "Files Uploaded", value: report.contributionBreakdown.fileUploaded },
-    { name: "Comments Added", value: report.contributionBreakdown.commentAdded },
-    { name: "Messages Sent", value: report.contributionBreakdown.messageSent },
+    { name: "Tasks Completed", value: (report.contributionBreakdown || {}).taskCompleted },
+    { name: "Tasks Created", value: (report.contributionBreakdown || {}).taskCreated },
+    { name: "Documents Edited", value: (report.contributionBreakdown || {}).documentEdited },
+    { name: "Files Uploaded", value: (report.contributionBreakdown || {}).fileUploaded },
+    { name: "Comments Added", value: (report.contributionBreakdown || {}).commentAdded },
+    { name: "Messages Sent", value: (report.contributionBreakdown || {}).messageSent },
   ].filter((d) => d.value > 0);
 
   return (
@@ -523,17 +523,17 @@ export default function StudentReportPage() {
                   Group Memberships
                 </CardTitle>
                 <p className="text-xs text-zinc-500">
-                  {report.groups.length} group{report.groups.length !== 1 ? "s" : ""} joined
+                  {(report.groups || []).length} group{(report.groups || []).length !== 1 ? "s" : ""} joined
                 </p>
               </CardHeader>
               <CardContent>
-                {report.groups.length === 0 ? (
+                {(report.groups || []).length === 0 ? (
                   <p className="py-8 text-center text-sm text-zinc-500">
                     No group memberships found.
                   </p>
                 ) : (
                   <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                    {report.groups.map((group) => (
+                    {(report.groups || []).map((group) => (
                       <div
                         key={group.groupId}
                         className="rounded-lg border border-zinc-800/60 bg-zinc-800/20 p-4"

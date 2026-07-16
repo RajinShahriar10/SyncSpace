@@ -37,7 +37,7 @@ export default function GroupRiskDetailPage() {
     fetchAlerts(undefined, undefined, false);
   }, [groupId, fetchGroupDetail, fetchAlerts]);
 
-  const groupAlerts = alerts.filter((a) => a.projectGroupId === groupId);
+  const groupAlerts = (alerts || []).filter((a) => a.projectGroupId === groupId);
   const assessment = groupDetail?.assessment;
   const config = assessment ? riskConfig[assessment.riskLevel as keyof typeof riskConfig] || riskConfig.Low : riskConfig.Low;
 
@@ -159,7 +159,7 @@ export default function GroupRiskDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {groupDetail?.members.map((m) => (
+                  {(groupDetail?.members || []).map((m) => (
                     <div key={m.userId} className={`flex items-center justify-between p-2 rounded-lg ${m.isInactive ? "bg-red-500/5 border border-red-500/10" : "bg-white/[0.02]"}`}>
                       <div className="flex items-center gap-2">
                         <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
@@ -190,7 +190,7 @@ export default function GroupRiskDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  {groupDetail?.milestones.map((m) => (
+                  {(groupDetail?.milestones || []).map((m) => (
                     <div key={m.id} className={`flex items-center justify-between p-2 rounded-lg ${m.isOverdue ? "bg-red-500/5 border border-red-500/10" : m.isCompleted ? "bg-emerald-500/5" : "bg-white/[0.02]"}`}>
                       <div className="flex items-center gap-2">
                         {m.isCompleted ? (

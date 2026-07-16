@@ -47,6 +47,7 @@ export default function WorkspacesPage() {
   const [showCreate, setShowCreate] = useState(false);
   const [creating, setCreating] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [createError, setCreateError] = useState("");
 
   const {
     register,
@@ -63,13 +64,15 @@ export default function WorkspacesPage() {
 
   const onCreate = async (data: CreateFormData) => {
     setCreating(true);
+    setCreateError("");
     try {
       const ws = await createWorkspace(data);
       reset();
       setShowCreate(false);
       router.push(`/workspaces/${ws.id}/settings`);
-    } catch {
-      // error in store
+    } catch (err: any) {
+      const msg = err?.response?.data?.message || err?.message || "Failed to create project. Please try again.";
+      setCreateError(typeof msg === "string" ? msg : "Failed to create project.");
     } finally {
       setCreating(false);
     }
@@ -140,10 +143,15 @@ export default function WorkspacesPage() {
                           </>
                         )}
                       </Button>
-                      <Button variant="ghost" onClick={() => setShowCreate(false)} type="button">
+                      <Button variant="ghost" onClick={() => { setShowCreate(false); setCreateError(""); }} type="button">
                         Cancel
                       </Button>
                     </div>
+                    {createError && (
+                      <div className="rounded-lg bg-destructive/10 border border-destructive/20 px-4 py-3 text-sm text-destructive">
+                        {createError}
+                      </div>
+                    )}
                   </form>
                 </CardContent>
               </Card>

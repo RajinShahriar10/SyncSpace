@@ -31,8 +31,8 @@ export default function MilestoneDetailPage() {
   const [editDescription, setEditDescription] = useState("");
   const [editDueDate, setEditDueDate] = useState("");
 
-  const milestone = milestones.find((m) => m.id === milestoneId);
-  const timelineEntries = timeline.filter((t) => t.id === milestoneId);
+  const milestone = (milestones || []).find((m) => m.id === milestoneId);
+  const timelineEntries = (timeline || []).filter((t) => t.id === milestoneId);
 
   useEffect(() => {
     if (milestone?.projectGroupId) {
@@ -166,7 +166,7 @@ export default function MilestoneDetailPage() {
           <Card>
             <CardContent className="p-4 text-center">
               <Users className="h-5 w-5 text-emerald-400 mx-auto mb-2" />
-              <p className="text-2xl font-bold">{milestone.assignedMembers.length}</p>
+              <p className="text-2xl font-bold">{(milestone.assignedMembers || []).length}</p>
               <p className="text-xs text-muted-foreground">Assigned</p>
             </CardContent>
           </Card>
@@ -188,7 +188,7 @@ export default function MilestoneDetailPage() {
         </motion.div>
 
         {/* Assigned Members */}
-        {milestone.assignedMembers.length > 0 && (
+        {(milestone.assignedMembers || []).length > 0 && (
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}>
             <Card>
               <CardHeader>
@@ -196,7 +196,7 @@ export default function MilestoneDetailPage() {
               </CardHeader>
               <CardContent>
                 <div className="flex flex-wrap gap-2">
-                  {milestone.assignedMembers.map((member) => (
+                  {(milestone.assignedMembers || []).map((member) => (
                     <div key={member.userId} className="flex items-center gap-2 rounded-full bg-white/5 px-3 py-1.5 text-xs">
                       <div className="h-5 w-5 rounded-full bg-primary/20 flex items-center justify-center text-[10px] font-bold text-primary">
                         {member.name[0]}
@@ -235,10 +235,10 @@ export default function MilestoneDetailPage() {
                 <div className="relative">
                   <div className="absolute left-4 top-0 bottom-0 w-px bg-white/10" />
                   <div className="space-y-6">
-                    {timeline.length === 0 ? (
+                    {(timeline || []).length === 0 ? (
                       <p className="text-sm text-muted-foreground text-center py-4">No timeline data available</p>
                     ) : (
-                      timeline.map((entry, i) => (
+                      (timeline || []).map((entry, i) => (
                         <motion.div
                           key={entry.id}
                           initial={{ opacity: 0, x: -10 }}
@@ -258,15 +258,15 @@ export default function MilestoneDetailPage() {
                             <p className="text-xs text-muted-foreground mt-0.5">
                               {format(new Date(entry.startDate), "MMM d")} - {format(new Date(entry.dueDate), "MMM d")}
                             </p>
-                            {entry.assignedMembers.length > 0 && (
+                            {(entry.assignedMembers || []).length > 0 && (
                               <div className="flex gap-1 mt-1.5">
-                                {entry.assignedMembers.slice(0, 3).map((m) => (
+                                {(entry.assignedMembers || []).slice(0, 3).map((m) => (
                                   <span key={m.userId} className="text-[10px] text-muted-foreground bg-white/5 px-1.5 py-0.5 rounded">
                                     {m.name}
                                   </span>
                                 ))}
-                                {entry.assignedMembers.length > 3 && (
-                                  <span className="text-[10px] text-muted-foreground">+{entry.assignedMembers.length - 3}</span>
+                                {(entry.assignedMembers || []).length > 3 && (
+                                  <span className="text-[10px] text-muted-foreground">+{(entry.assignedMembers || []).length - 3}</span>
                                 )}
                               </div>
                             )}
@@ -284,11 +284,11 @@ export default function MilestoneDetailPage() {
           {activeTab === "history" && (
             <Card>
               <CardContent className="p-6">
-                {history.length === 0 ? (
+                {(history || []).length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">No completed milestones yet</p>
                 ) : (
                   <div className="space-y-3">
-                    {history.map((entry) => (
+                    {(history || []).map((entry) => (
                       <div key={entry.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03]">
                         <div className="flex items-center gap-3">
                           <CheckCircle2 className="h-4 w-4 text-emerald-400" />
@@ -324,11 +324,11 @@ export default function MilestoneDetailPage() {
                     <BellRing className="h-3 w-3" /> Generate
                   </Button>
                 </div>
-                {reminders.length === 0 ? (
+                {(reminders || []).length === 0 ? (
                   <p className="text-sm text-muted-foreground text-center py-4">No reminders configured</p>
                 ) : (
                   <div className="space-y-2">
-                    {reminders.map((r) => (
+                    {(reminders || []).map((r) => (
                       <div key={r.id} className="flex items-center justify-between p-3 rounded-lg bg-white/[0.03]">
                         <div className="flex items-center gap-3">
                           <Bell className={`h-4 w-4 ${r.isSent ? "text-emerald-400" : "text-muted-foreground"}`} />

@@ -38,7 +38,7 @@ export default function NotificationsPage() {
   }, [deleteNotification]);
 
   const filtered = filter === "unread"
-    ? notifications.filter((n) => !n.isRead)
+    ? (notifications || []).filter((n) => !n.isRead)
     : notifications;
 
   return (

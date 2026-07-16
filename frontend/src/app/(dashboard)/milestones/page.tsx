@@ -21,9 +21,9 @@ export default function MilestonesPage() {
   } = useMilestoneStore();
   const [showComplete, setShowComplete] = useState<string | null>(null);
 
-  const activeMilestones = milestones.filter((m) => !m.isCompleted);
-  const completedMilestones = milestones.filter((m) => m.isCompleted);
-  const overdueMilestones = milestones.filter(
+  const activeMilestones = (milestones || []).filter((m) => !m.isCompleted);
+  const completedMilestones = (milestones || []).filter((m) => m.isCompleted);
+  const overdueMilestones = (milestones || []).filter(
     (m) => !m.isCompleted && new Date(m.dueDate) < new Date()
   );
 
@@ -141,8 +141,8 @@ export default function MilestonesPage() {
                               <Calendar className="h-3 w-3" />
                               {new Date(m.startDate).toLocaleDateString()} - {new Date(m.dueDate).toLocaleDateString()}
                             </span>
-                            {m.assignedMembers.length > 0 && (
-                              <span>{m.assignedMembers.length} assigned</span>
+                            {(m.assignedMembers || []).length > 0 && (
+                              <span>{(m.assignedMembers || []).length} assigned</span>
                             )}
                           </div>
                         </div>
