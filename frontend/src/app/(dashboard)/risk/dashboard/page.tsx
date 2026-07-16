@@ -351,7 +351,7 @@ export default function RiskDashboardPage() {
 
                             {/* Factor Bars */}
                             <div className="hidden sm:flex gap-1 shrink-0">
-                              {Object.entries(a.factorScores).map(([key, score]) => {
+                              {Object.entries(a.factorScores || {}).map(([key, score]) => {
                                 const maxScore = key === "inactiveMembers" || key === "delayedMilestones" ? 25 : key === "lowContribution" ? 20 : 15;
                                 const percent = Math.round((score as number) / maxScore * 100);
                                 return (

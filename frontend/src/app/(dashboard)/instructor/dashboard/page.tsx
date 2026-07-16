@@ -433,7 +433,7 @@ function InstructorDashboardContent() {
                                   </div>
                                 </div>
                                 <div className="flex -space-x-2">
-                                  {group.members.slice(0, 4).map((m) => (
+                                  {(group.members || []).slice(0, 4).map((m) => (
                                     <div
                                       key={m.userId}
                                       className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/20 text-[10px] font-bold text-primary border-2 border-background"
@@ -442,9 +442,9 @@ function InstructorDashboardContent() {
                                       {m.name.split(" ").map((n) => n[0]).join("")}
                                     </div>
                                   ))}
-                                  {group.members.length > 4 && (
+                                  {(group.members || []).length > 4 && (
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-white/10 text-[10px] font-bold text-muted-foreground border-2 border-background">
-                                      +{group.members.length - 4}
+                                      +{(group.members || []).length - 4}
                                     </div>
                                   )}
                                 </div>
@@ -478,8 +478,8 @@ function InstructorDashboardContent() {
                       <CardContent>
                         {contributions?.activityBreakdown && contributions.activityBreakdown.length > 0 ? (
                           <div className="space-y-4">
-                            {contributions.activityBreakdown.map((ab, i) => {
-                              const maxCount = Math.max(...contributions.activityBreakdown.map((x) => x.count), 1);
+                            {(contributions?.activityBreakdown || []).map((ab, i) => {
+                              const maxCount = Math.max(...(contributions?.activityBreakdown || []).map((x) => x.count), 1);
                               const width = (ab.count / maxCount) * 100;
                               return (
                                 <div key={ab.activityType} className="space-y-1.5">
@@ -551,7 +551,7 @@ function InstructorDashboardContent() {
                                 </tr>
                               </thead>
                               <tbody>
-                                {contributions.studentContributions.map((sc, i) => (
+                                {(contributions?.studentContributions || []).map((sc, i) => (
                                   <motion.tr
                                     key={sc.studentId}
                                     initial={{ opacity: 0 }}

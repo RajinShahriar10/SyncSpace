@@ -21,6 +21,7 @@ export function useNotificationHub(userId: string | undefined) {
     const conn = new HubConnectionBuilder()
       .withUrl(HUB_URL, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
+      .configureLogging(0)
       .build();
 
     conn.on("NewNotification", (notification: NotificationDto) => {
