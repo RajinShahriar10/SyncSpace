@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
+import { Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   BookOpen, GraduationCap, FileText, Users, Target, Shield,
@@ -86,6 +88,8 @@ const item = {
 };
 
 export default function Home() {
+  const { theme, setTheme } = useTheme();
+
   return (
     <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-background">
       {/* Background gradients */}
@@ -128,6 +132,37 @@ export default function Home() {
           backgroundSize: "32px 32px",
         }}
       />
+
+      {/* Navbar */}
+      <nav className="relative z-20 w-full">
+        <div className="max-w-6xl mx-auto flex items-center justify-between px-4 sm:px-6 py-4">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="text-xl font-bold gradient-text">SyncSpace</span>
+            <span className="text-sm font-medium text-primary">EDU</span>
+          </Link>
+          <div className="flex items-center gap-3">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+            </Button>
+            <Link href="/login">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                Sign In
+              </Button>
+            </Link>
+            <Link href="/register">
+              <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90">
+                Get Started
+              </Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
 
       {/* Main content */}
       <main className="relative z-10 flex flex-col items-center pt-20 sm:pt-28 pb-20 px-4 sm:px-6 w-full max-w-6xl mx-auto">
