@@ -34,12 +34,15 @@ public class RiskDashboardController : ControllerBase
         return Ok(ApiResponse<RiskAssessmentDto[]>.SuccessResponse(assessments));
     }
 
-    [HttpPost("assess/{projectGroupId:guid}")]
-    public async Task<ActionResult<ApiResponse<RiskAssessmentDto>>> AssessGroup(Guid projectGroupId)
+    [HttpPost("assess/{projectGroupId}")]
+    public async Task<ActionResult<ApiResponse<RiskAssessmentDto>>> AssessGroup(string projectGroupId)
     {
+        if (!Guid.TryParse(projectGroupId, out var groupGuid))
+            return NotFound(ApiResponse<RiskAssessmentDto>.NotFound("Invalid group ID format."));
+
         try
         {
-            var assessment = await _riskService.AssessGroupRiskAsync(projectGroupId);
+            var assessment = await _riskService.AssessGroupRiskAsync(groupGuid);
             return Ok(ApiResponse<RiskAssessmentDto>.SuccessResponse(assessment));
         }
         catch (ArgumentException ex)
@@ -58,19 +61,25 @@ public class RiskDashboardController : ControllerBase
         return Ok(ApiResponse<RiskAlertDto[]>.SuccessResponse(alerts));
     }
 
-    [HttpPost("alerts/{alertId:guid}/acknowledge")]
-    public async Task<IActionResult> AcknowledgeAlert(Guid alertId, [FromQuery] Guid userId)
+    [HttpPost("alerts/{alertId}/acknowledge")]
+    public async Task<IActionResult> AcknowledgeAlert(string alertId, [FromQuery] Guid userId)
     {
-        var success = await _riskService.AcknowledgeAlertAsync(alertId, userId);
+        if (!Guid.TryParse(alertId, out var alertGuid))
+            return NotFound(ApiResponse<object>.NotFound("Invalid alert ID format."));
+
+        var success = await _riskService.AcknowledgeAlertAsync(alertGuid, userId);
         return success ? Ok(ApiResponse<object>.SuccessResponse(new { message = "Alert acknowledged" })) : NotFound();
     }
 
-    [HttpGet("group/{projectGroupId:guid}")]
-    public async Task<ActionResult<ApiResponse<GroupRiskDetailDto>>> GetGroupDetail(Guid projectGroupId)
+    [HttpGet("group/{projectGroupId}")]
+    public async Task<ActionResult<ApiResponse<GroupRiskDetailDto>>> GetGroupDetail(string projectGroupId)
     {
+        if (!Guid.TryParse(projectGroupId, out var groupGuid))
+            return NotFound(ApiResponse<GroupRiskDetailDto>.NotFound("Invalid group ID format."));
+
         try
         {
-            var detail = await _riskService.GetGroupDetailAsync(projectGroupId);
+            var detail = await _riskService.GetGroupDetailAsync(groupGuid);
             return Ok(ApiResponse<GroupRiskDetailDto>.SuccessResponse(detail));
         }
         catch (ArgumentException ex)

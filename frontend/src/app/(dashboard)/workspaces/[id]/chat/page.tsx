@@ -38,7 +38,7 @@ export default function ChatPage() {
     const conn = new HubConnectionBuilder()
       .withUrl(HUB_URL, { accessTokenFactory: () => token })
       .withAutomaticReconnect()
-      .configureLogging(0)
+      .configureLogging({ logLevel: "none" } as any)
       .build();
 
     conn.start().then(() => {
