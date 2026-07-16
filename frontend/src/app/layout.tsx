@@ -10,22 +10,22 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "SyncSpace - Enterprise Real-Time Collaboration Platform",
+  title: "SyncSpace EDU - University Project Collaboration Platform",
   description:
-    "A unified collaborative workspace combining documents, boards, messaging, and real-time collaboration into one premium platform.",
-  keywords: ["collaboration", "workspace", "documents", "project management", "real-time"],
-  authors: [{ name: "SyncSpace" }],
+    "The intelligent workspace for university teams. Track contributions, manage milestones, detect risks early — all in one premium platform.",
+  keywords: ["collaboration", "workspace", "documents", "project management", "real-time", "education", "university", "academic"],
+  authors: [{ name: "SyncSpace EDU" }],
   openGraph: {
     type: "website",
     locale: "en_US",
-    siteName: "SyncSpace",
-    title: "SyncSpace - Enterprise Real-Time Collaboration Platform",
-    description: "A unified collaborative workspace for modern teams.",
+    siteName: "SyncSpace EDU",
+    title: "SyncSpace EDU - University Project Collaboration Platform",
+    description: "The intelligent workspace for university teams.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "SyncSpace",
-    description: "Enterprise Real-Time Collaboration Platform",
+    title: "SyncSpace EDU",
+    description: "University Project Collaboration & Supervision Platform",
   },
   robots: {
     index: true,
