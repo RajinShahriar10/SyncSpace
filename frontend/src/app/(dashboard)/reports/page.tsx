@@ -1,8 +1,8 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import {
   FileText,
   Users,
@@ -13,11 +13,18 @@ import {
   GraduationCap,
   Calendar,
   Shield,
+  ChevronDown,
+  ChevronRight,
+  Loader2,
+  AlertCircle,
+  User,
 } from "lucide-react"
 import { DashboardLayout } from "@/components/layout/dashboard-layout"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { useAuthStore } from "@/store"
+import { getCourses, type Course } from "@/lib/course"
+import { getGroupsByCourse, type ProjectGroup } from "@/lib/projectGroup"
 
 const container = {
   hidden: { opacity: 0 },
@@ -34,64 +41,52 @@ const item = {
   show: { opacity: 1, y: 0 },
 }
 
-const reportTypes = [
-  {
-    title: "Student Report",
-    description:
-      "Individual contribution analysis, activity trends, and performance metrics",
-    icon: Users,
-    color: "primary",
-    href: "/reports/student/",
-    gradient: "from-indigo-500/10 to-violet-500/10",
-  },
-  {
-    title: "Group Report",
-    description:
-      "Team progress, milestone completion, and contribution distribution",
-    icon: Users,
-    color: "secondary",
-    href: "/reports/group/",
-    gradient: "from-purple-500/10 to-pink-500/10",
-  },
-  {
-    title: "Instructor Report",
-    description:
-      "Course statistics, group rankings, and participation analytics",
-    icon: BookOpen,
-    color: "emerald",
-    href: "/reports/instructor/",
-    gradient: "from-emerald-500/10 to-teal-500/10",
-  },
-  {
-    title: "Semester Summary",
-    description:
-      "Comprehensive semester evaluation with top performers and trends",
-    icon: Calendar,
-    color: "amber",
-    href: "/reports/semester/",
-    gradient: "from-amber-500/10 to-orange-500/10",
-  },
-]
+const fadeIn = {
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.25 } },
+}
 
 export default function ReportsPage() {
-  const [searchId, setSearchId] = useState("")
-  const [idError, setIdError] = useState("")
-  const inputRef = useRef<HTMLInputElement>(null)
   const router = useRouter()
+  const { user } = useAuthStore()
+  const [courses, setCourses] = useState<Course[]>([])
+  const [courseGroups, setCourseGroups] = useState<Record<string, ProjectGroup[]>>({})
+  const [expandedCourse, setExpandedCourse] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchCoursesAndGroups = useCallback(async () => {
+    try {
+      setIsLoading(true)
+      setError(null)
+      const courseList = await getCourses()
+      setCourses(courseList)
+
+      const groupsMap: Record<string, ProjectGroup[]> = {}
+      await Promise.all(
+        courseList.map(async (course) => {
+          try {
+            const groups = await getGroupsByCourse(course.id)
+            groupsMap[course.id] = groups
+          } catch {
+            groupsMap[course.id] = []
+          }
+        })
+      )
+      setCourseGroups(groupsMap)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to load courses")
+    } finally {
+      setIsLoading(false)
+    }
+  }, [])
 
   useEffect(() => {
-    const stored = localStorage.getItem("studentId");
-    if (stored) setSearchId(stored);
-  }, []);
+    fetchCoursesAndGroups()
+  }, [fetchCoursesAndGroups])
 
-  const handleNavigate = (href: string) => {
-    if (searchId.trim()) {
-      setIdError("")
-      router.push(`${href}${searchId}`)
-    } else {
-      setIdError("Enter an ID above first")
-      inputRef.current?.focus()
-    }
+  const toggleCourse = (courseId: string) => {
+    setExpandedCourse(expandedCourse === courseId ? null : courseId)
   }
 
   return (
@@ -118,6 +113,7 @@ export default function ReportsPage() {
           </div>
         </motion.div>
 
+        {/* Quick Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -126,83 +122,187 @@ export default function ReportsPage() {
         >
           <Card className="border border-border-subtle bg-surface-sunken backdrop-blur-xl">
             <CardContent className="p-6">
-              <div className="flex items-center gap-4">
-                <div className="relative flex-1">
-                  <GraduationCap className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    ref={inputRef}
-                    placeholder="Enter Course ID or Student ID..."
-                    value={searchId}
-                    onChange={(e) => { setSearchId(e.target.value); setIdError("") }}
-                    className="pl-10 bg-surface-sunken border-border-subtle text-foreground placeholder:text-muted-foreground focus:border-primary/50 focus:ring-primary/20"
-                  />
-                  {idError && (
-                    <p className="text-xs text-amber-400 mt-1.5">{idError}</p>
-                  )}
-                </div>
+              <h3 className="text-sm font-medium text-foreground mb-4">Quick Actions</h3>
+              <div className="flex flex-wrap gap-3">
                 <Button
                   variant="outline"
                   className="border-border-subtle bg-surface-sunken hover:bg-surface-hover text-foreground"
+                  onClick={() => user && router.push(`/reports/student/${user.id}`)}
+                  disabled={!user}
                 >
-                  <Download className="mr-2 h-4 w-4" />
-                  Export All
+                  <User className="mr-2 h-4 w-4" />
+                  My Student Report
                 </Button>
               </div>
             </CardContent>
           </Card>
         </motion.div>
 
-        <motion.div
-          variants={container}
-          initial="hidden"
-          animate="show"
-          className="grid grid-cols-1 md:grid-cols-2 gap-6"
-        >
-          {reportTypes.map((report) => {
-            const Icon = report.icon
-            return (
-              <motion.div key={report.title} variants={item}>
-                <Card
-                  className="group relative overflow-hidden border border-border-subtle bg-surface-sunken backdrop-blur-xl cursor-pointer transition-all duration-300 hover:border-border-default hover:bg-surface-hover"
-                  onClick={() => handleNavigate(report.href)}
-                >
-                  <div
-                    className={`absolute inset-0 bg-gradient-to-br ${report.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`}
-                  />
-                  <CardContent className="relative p-6">
-                    <div className="flex items-start justify-between">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-white/[0.08] to-white/[0.02] border border-border-subtle group-hover:scale-110 transition-transform duration-300">
-                        <Icon
-                          className={`h-6 w-6 ${
-                            report.color === "primary"
-                              ? "text-indigo-400"
-                              : report.color === "secondary"
-                              ? "text-purple-400"
-                              : report.color === "emerald"
-                              ? "text-emerald-400"
-                              : "text-amber-400"
-                          }`}
-                        />
-                      </div>
-                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-surface-hover border border-border-subtle opacity-0 group-hover:opacity-100 transition-all duration-300 group-hover:translate-x-1">
-                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
-                      </div>
-                    </div>
-                    <div className="mt-4">
-                      <h3 className="text-lg font-medium text-foreground mb-1 group-hover:text-indigo-300 transition-colors duration-300">
-                        {report.title}
-                      </h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">
-                        {report.description}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              </motion.div>
-            )
-          })}
-        </motion.div>
+        {/* Courses & Groups */}
+        {isLoading ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="flex items-center justify-center py-20"
+          >
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </motion.div>
+        ) : error ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <Card className="border border-red-500/20 bg-red-500/5">
+              <CardContent className="p-6 flex items-center gap-3">
+                <AlertCircle className="h-5 w-5 text-red-400" />
+                <div>
+                  <p className="text-sm text-foreground">{error}</p>
+                  <Button
+                    variant="link"
+                    className="p-0 h-auto text-xs text-muted-foreground"
+                    onClick={fetchCoursesAndGroups}
+                  >
+                    Try again
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : courses.length === 0 ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+          >
+            <Card className="border border-border-subtle bg-surface-sunken">
+              <CardContent className="p-10 text-center">
+                <BookOpen className="h-10 w-10 text-muted-foreground mx-auto mb-3" />
+                <p className="text-sm text-muted-foreground">No courses found. Create a course first to generate reports.</p>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="space-y-4"
+          >
+            {courses.map((course) => {
+              const groups = courseGroups[course.id] || []
+              const isExpanded = expandedCourse === course.id
 
+              return (
+                <motion.div key={course.id} variants={item}>
+                  <Card className="border border-border-subtle bg-surface-sunken backdrop-blur-xl overflow-hidden">
+                    {/* Course Header */}
+                    <div
+                      className="flex items-center justify-between p-5 cursor-pointer hover:bg-surface-hover transition-colors"
+                      onClick={() => toggleCourse(course.id)}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-emerald-500/20 to-teal-500/20 border border-border-subtle">
+                          <BookOpen className="h-5 w-5 text-emerald-400" />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-medium text-foreground">
+                            {course.courseName}
+                          </h3>
+                          <p className="text-xs text-muted-foreground">
+                            {course.courseCode} &middot; {course.semester} &middot; {groups.length} group{groups.length !== 1 ? "s" : ""}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        {/* Report buttons */}
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-border-subtle bg-surface-sunken hover:bg-surface-hover text-foreground"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            router.push(`/reports/instructor/${course.id}`)
+                          }}
+                        >
+                          <BarChart3 className="mr-1.5 h-3.5 w-3.5" />
+                          Instructor
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-border-subtle bg-surface-sunken hover:bg-surface-hover text-foreground"
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            router.push(`/reports/semester/${course.id}`)
+                          }}
+                        >
+                          <Calendar className="mr-1.5 h-3.5 w-3.5" />
+                          Semester
+                        </Button>
+                        {isExpanded ? (
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
+                        ) : (
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Groups List */}
+                    <AnimatePresence>
+                      {isExpanded && (
+                        <motion.div
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: "auto", opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25 }}
+                        >
+                          <div className="border-t border-border-subtle">
+                            {groups.length === 0 ? (
+                              <div className="p-5 text-center">
+                                <p className="text-xs text-muted-foreground">No groups in this course yet.</p>
+                              </div>
+                            ) : (
+                              <div className="divide-y divide-border-subtle">
+                                {groups.map((group) => (
+                                  <div
+                                    key={group.id}
+                                    className="flex items-center justify-between px-5 py-3 hover:bg-surface-hover transition-colors"
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-purple-500/10 border border-purple-500/20">
+                                        <Users className="h-4 w-4 text-purple-400" />
+                                      </div>
+                                      <div>
+                                        <p className="text-sm font-medium text-foreground">{group.groupName}</p>
+                                        <p className="text-xs text-muted-foreground">
+                                          Leader: {group.leaderName} &middot; {group.memberCount} member{group.memberCount !== 1 ? "s" : ""}
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      className="border-border-subtle bg-surface-sunken hover:bg-surface-hover text-foreground"
+                                      onClick={() => router.push(`/reports/group/${group.id}`)}
+                                    >
+                                      <FileText className="mr-1.5 h-3.5 w-3.5" />
+                                      Group Report
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </Card>
+                </motion.div>
+              )
+            })}
+          </motion.div>
+        )}
+
+        {/* Privacy Notice */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
