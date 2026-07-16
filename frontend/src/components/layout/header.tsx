@@ -20,7 +20,7 @@ export function Header() {
 
   return (
     <>
-      <header className="glass sticky top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b border-white/10 px-3 sm:px-6">
+      <header className="glass sticky top-0 z-30 flex h-14 sm:h-16 items-center justify-between border-b border-border-subtle px-3 sm:px-6">
         <div className="flex items-center gap-3 flex-1 min-w-0">
           <Button
             variant="ghost"
@@ -36,11 +36,11 @@ export function Header() {
             className="relative max-w-md flex-1 group"
           >
             <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground group-hover:text-foreground/60 transition-colors" />
-            <div className="h-9 sm:h-10 w-full rounded-xl border border-white/[0.06] bg-white/[0.03] pl-9 sm:pl-10 pr-12 sm:pr-16 text-xs sm:text-sm text-muted-foreground text-left leading-9 sm:leading-10 cursor-pointer hover:bg-white/[0.06] hover:border-white/[0.1] transition-all duration-200">
+            <div className="h-9 sm:h-10 w-full rounded-xl border border-border-subtle bg-surface-sunken pl-9 sm:pl-10 pr-12 sm:pr-16 text-xs sm:text-sm text-muted-foreground text-left leading-9 sm:leading-10 cursor-pointer hover:bg-surface-hover hover:border-border-default transition-all duration-200">
               <span className="hidden sm:inline">Search everything...</span>
               <span className="sm:hidden">Search...</span>
             </div>
-            <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-white/[0.06] bg-white/[0.03] px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hidden sm:block">
+            <kbd className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-border-subtle bg-surface-sunken px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hidden sm:block">
               ⌘K
             </kbd>
           </button>
@@ -60,7 +60,7 @@ export function Header() {
           <NotificationDropdown />
 
           <div className="ml-1 sm:ml-2">
-            <Avatar className="h-7 w-7 sm:h-8 sm:w-8 ring-2 ring-white/5 hover:ring-primary/20 transition-all cursor-pointer">
+            <Avatar className="h-7 w-7 sm:h-8 sm:w-8 ring-2 ring-border-subtle hover:ring-primary/20 transition-all cursor-pointer">
               <AvatarImage src={user?.avatarUrl} alt={user?.firstName} />
               <AvatarFallback className="bg-gradient-to-br from-primary/20 to-secondary/20 text-primary text-[10px] sm:text-xs font-bold">
                 {user ? getInitials(`${user.firstName} ${user.lastName}`) : "SS"}

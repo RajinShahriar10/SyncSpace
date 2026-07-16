@@ -3,7 +3,53 @@
 @tailwind utilities;
 
 @layer base {
+  /* ── Light mode (default) ── */
   :root {
+    --background: 0 0% 100%;
+    --foreground: 224 71% 4%;
+    --card: 0 0% 100%;
+    --card-foreground: 224 71% 4%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 224 71% 4%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 263 70% 58%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 220 14% 96%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 187 94% 43%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 239 84% 67%;
+    --radius: 0.75rem;
+
+    /* Surface layers */
+    --surface: 0 0% 100%;
+    --surface-hover: 220 14% 96%;
+    --surface-active: 220 13% 93%;
+    --surface-overlay: 0 0% 100%;
+    --surface-raised: 0 0% 100%;
+    --surface-sunken: 220 14% 97%;
+
+    /* Text layers */
+    --text-primary: 224 71% 4%;
+    --text-secondary: 220 9% 46%;
+    --text-tertiary: 220 9% 60%;
+    --text-on-accent: 210 40% 98%;
+
+    /* Border layers */
+    --border-subtle: 220 13% 91%;
+    --border-default: 220 13% 86%;
+
+    /* Overlay */
+    --overlay: 224 71% 4%;
+  }
+
+  /* ── Dark mode ── */
+  .dark {
     --background: 222 47% 4%;
     --foreground: 210 40% 98%;
     --card: 222 47% 7%;
@@ -24,6 +70,27 @@
     --input: 217 33% 17%;
     --ring: 239 84% 67%;
     --radius: 0.75rem;
+
+    /* Surface layers */
+    --surface: 222 47% 7%;
+    --surface-hover: 217 33% 14%;
+    --surface-active: 217 33% 17%;
+    --surface-overlay: 222 47% 4%;
+    --surface-raised: 222 47% 10%;
+    --surface-sunken: 222 50% 3%;
+
+    /* Text layers */
+    --text-primary: 210 40% 98%;
+    --text-secondary: 215 20% 65%;
+    --text-tertiary: 215 16% 47%;
+    --text-on-accent: 210 40% 98%;
+
+    /* Border layers */
+    --border-subtle: 217 33% 17%;
+    --border-default: 217 33% 22%;
+
+    /* Overlay */
+    --overlay: 0 0% 0%;
   }
 
   * {
@@ -62,11 +129,25 @@
 
 @layer utilities {
   .glass {
-    @apply bg-white/5 backdrop-blur-xl border border-white/10;
+    @apply backdrop-blur-xl;
+    background-color: hsl(var(--surface-overlay) / 0.05);
+    border-color: hsl(var(--border-subtle) / 0.5);
+  }
+
+  .dark .glass {
+    background-color: hsl(210 40% 98% / 0.05);
+    border-color: hsl(210 40% 98% / 0.1);
   }
 
   .glass-strong {
-    @apply bg-white/10 backdrop-blur-2xl border border-white/15;
+    @apply backdrop-blur-2xl;
+    background-color: hsl(var(--surface-overlay) / 0.1);
+    border-color: hsl(var(--border-subtle) / 0.6);
+  }
+
+  .dark .glass-strong {
+    background-color: hsl(210 40% 98% / 0.1);
+    border-color: hsl(210 40% 98% / 0.15);
   }
 
   .gradient-text {

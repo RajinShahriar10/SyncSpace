@@ -60,7 +60,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
       initial={false}
       animate={{ width: sidebarOpen ? 260 : 72 }}
       transition={{ duration: 0.3, ease: [0.25, 0.1, 0.25, 1] }}
-      className="glass sticky top-0 flex h-screen w-[260px] md:w-auto flex-col border-r border-white/10"
+      className="glass sticky top-0 flex h-screen w-[260px] md:w-auto flex-col border-r border-border-subtle"
     >
       <div className="flex h-16 items-center justify-between px-4">
         {sidebarOpen && (
@@ -91,7 +91,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
                       whileTap={{ scale: 0.98 }}
                       className={cn(
                         "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200",
-                        isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
+                        isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:bg-surface-hover hover:text-foreground"
                       )}
                     >
                       {isActive && <motion.div layoutId="sidebar-active" className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-[3px] rounded-r-full bg-primary" transition={{ type: "spring", stiffness: 350, damping: 30 }} />}
@@ -106,7 +106,7 @@ export function Sidebar({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </div>
 
-      <div className="border-t border-white/10 p-3">
+      <div className="border-t border-border-subtle p-3">
         <Button variant="glass" className="w-full justify-start gap-3" asChild>
           <Link href="/courses" onClick={onNavigate}>
             <Plus className="h-5 w-5 shrink-0" />

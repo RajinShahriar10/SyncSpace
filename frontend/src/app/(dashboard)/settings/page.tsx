@@ -7,13 +7,15 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuthStore } from "@/store";
-import { Settings, LogOut, Save, Loader2, User, Check } from "lucide-react";
-import { getInitials } from "@/lib/utils";
+import { Settings, LogOut, Save, Loader2, User, Check, Sun, Moon, Monitor } from "lucide-react";
+import { cn, getInitials } from "@/lib/utils";
+import { useTheme } from "next-themes";
 
 export default function SettingsPage() {
   const { user, logout } = useAuthStore();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const { theme, setTheme } = useTheme();
   const [firstName, setFirstName] = useState(user?.firstName || "");
   const [lastName, setLastName] = useState(user?.lastName || "");
 
@@ -162,12 +164,28 @@ export default function SettingsPage() {
               <CardDescription>Customize the look and feel</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center justify-between rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
-                <div>
-                  <p className="text-sm font-medium">Theme</p>
-                  <p className="text-xs text-muted-foreground">Toggle between dark and light mode</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  {[
+                    { value: "light", label: "Light", icon: Sun },
+                    { value: "dark", label: "Dark", icon: Moon },
+                    { value: "system", label: "System", icon: Monitor },
+                  ].map((option) => (
+                    <button
+                      key={option.value}
+                      onClick={() => setTheme(option.value)}
+                      className={cn(
+                        "flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-all duration-200",
+                        theme === option.value
+                          ? "bg-primary/10 text-primary border border-primary/20"
+                          : "bg-surface-sunken border border-border-subtle hover:bg-surface-hover text-muted-foreground hover:text-foreground"
+                      )}
+                    >
+                      <option.icon className="h-4 w-4" />
+                      {option.label}
+                    </button>
+                  ))}
                 </div>
-                <p className="text-xs text-muted-foreground">Use the moon icon in the header</p>
               </div>
             </CardContent>
           </Card>

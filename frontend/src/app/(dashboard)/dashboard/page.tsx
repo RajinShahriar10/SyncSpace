@@ -115,7 +115,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="relative overflow-hidden rounded-2xl border border-white/[0.06] bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 sm:p-8"
+          className="relative overflow-hidden rounded-2xl border border-border-subtle bg-gradient-to-br from-primary/5 via-transparent to-secondary/5 p-6 sm:p-8"
         >
           <div className="relative z-10">
             <div className="flex items-center gap-2 mb-1">
@@ -142,7 +142,7 @@ export default function DashboardPage() {
           {stats.map((stat) => (
             <motion.div key={stat.title} variants={item}>
               <Card
-                className="group cursor-pointer transition-all duration-300 hover:bg-white/[0.07] hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-0.5"
+                className="group cursor-pointer transition-all duration-300 hover:bg-surface-hover hover:shadow-2xl hover:shadow-primary/5 hover:-translate-y-0.5"
                 onClick={() => router.push(stat.href)}
               >
                 <CardHeader className="flex flex-row items-center justify-between pb-2">
@@ -197,7 +197,7 @@ export default function DashboardPage() {
                       <button
                         key={ws.id}
                         onClick={() => router.push(`/workspaces/${ws.id}`)}
-                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all hover:bg-white/[0.05] group"
+                        className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all hover:bg-surface-hover group"
                       >
                         <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20 text-sm font-bold text-primary">
                           {ws.name[0].toUpperCase()}
@@ -233,7 +233,7 @@ export default function DashboardPage() {
                     <button
                       key={action.label}
                       onClick={() => router.push(action.href)}
-                      className="flex flex-col items-center gap-2 rounded-xl p-3 text-center transition-all hover:bg-white/[0.05] hover:-translate-y-0.5 duration-200"
+                      className="flex flex-col items-center gap-2 rounded-xl p-3 text-center transition-all hover:bg-surface-hover hover:-translate-y-0.5 duration-200"
                     >
                       <div className={`flex h-10 w-10 items-center justify-center rounded-xl ${action.color}`}>
                         <action.icon className="h-5 w-5" />
@@ -260,22 +260,22 @@ export default function DashboardPage() {
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-                  <div className="rounded-xl bg-white/[0.03] p-4 text-center">
+                  <div className="rounded-xl bg-surface-sunken p-4 text-center">
                     <Users className="h-5 w-5 text-blue-400 mx-auto mb-2" />
                     <p className="text-2xl font-bold">{overview.totalUsers}</p>
                     <p className="text-xs text-muted-foreground">Total Users</p>
                   </div>
-                  <div className="rounded-xl bg-white/[0.03] p-4 text-center">
+                  <div className="rounded-xl bg-surface-sunken p-4 text-center">
                     <FolderOpen className="h-5 w-5 text-violet-400 mx-auto mb-2" />
                     <p className="text-2xl font-bold">{overview.totalWorkspaces}</p>
                     <p className="text-xs text-muted-foreground">Projects</p>
                   </div>
-                  <div className="rounded-xl bg-white/[0.03] p-4 text-center">
+                  <div className="rounded-xl bg-surface-sunken p-4 text-center">
                     <FileText className="h-5 w-5 text-primary mx-auto mb-2" />
                     <p className="text-2xl font-bold">{overview.totalDocuments}</p>
                     <p className="text-xs text-muted-foreground">Documents</p>
                   </div>
-                  <div className="rounded-xl bg-white/[0.03] p-4 text-center">
+                  <div className="rounded-xl bg-surface-sunken p-4 text-center">
                     <FolderOpen className="h-5 w-5 text-cyan-400 mx-auto mb-2" />
                     <p className="text-2xl font-bold">{formatBytes(overview.totalStorageBytes)}</p>
                     <p className="text-xs text-muted-foreground">Storage Used</p>
