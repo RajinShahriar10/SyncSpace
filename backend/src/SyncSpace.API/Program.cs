@@ -57,9 +57,12 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-                builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ??
-                new[] { "http://localhost:3000" })
+        var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ??
+            new[] { "http://localhost:3000" };
+        var extraOrigins = new[] { "https://syncspace-work.vercel.app" };
+        var allOrigins = origins.Concat(extraOrigins).Distinct().ToArray();
+
+        policy.WithOrigins(allOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
