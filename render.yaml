@@ -1,0 +1,35 @@
+services:
+  - type: web
+    name: syncspace-api
+    runtime: docker
+    region: oregon
+    plan: free
+    dockerfilePath: Dockerfile
+    healthCheckPath: /health
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production
+      - key: ConnectionStrings__DefaultConnection
+        sync: false
+      - key: Jwt__Key
+        sync: false
+      - key: Jwt__Issuer
+        value: SyncSpace
+      - key: Jwt__Audience
+        value: SyncSpace
+      - key: Jwt__ExpirationInMinutes
+        value: 60
+      - key: Jwt__RefreshExpirationInDays
+        value: 7
+      - key: GitHub__ClientId
+        sync: false
+      - key: GitHub__ClientSecret
+        sync: false
+      - key: Cloudinary__CloudName
+        sync: false
+      - key: Cloudinary__ApiKey
+        sync: false
+      - key: Cloudinary__ApiSecret
+        sync: false
+      - key: Redis__Connection
+        value: ""

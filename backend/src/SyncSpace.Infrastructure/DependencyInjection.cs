@@ -100,9 +100,14 @@ public static class DependencyInjection
         services.AddScoped<SyncSpace.Application.Common.Interfaces.IAuditService, SyncSpace.Infrastructure.Services.AuditService>();
         services.AddScoped<SyncSpace.Application.Common.Interfaces.IAnalyticsService, SyncSpace.Infrastructure.Services.AnalyticsService>();
 
-        // Register cached decorators (these wrap the real services when Redis is available)
-        services.AddScoped<SyncSpace.Infrastructure.Services.CachedAnalyticsService>();
-        services.AddScoped<SyncSpace.Infrastructure.Services.CachedSearchService>();
+        // Register cached decorators only if Redis is available
+        var redisConn = configuration["Redis:Connection"] ?? configuration["REDIS_URL"];
+        if (!string.IsNullOrWhiteSpace(redisConn) && !redisConn.Contains("localhost"))
+        {
+            services.AddSingleton(StackExchange.Redis.ConnectionMultiplexer.Connect(redisConn!));
+            services.AddScoped<SyncSpace.Infrastructure.Services.CachedAnalyticsService>();
+            services.AddScoped<SyncSpace.Infrastructure.Services.CachedSearchService>();
+        }
         services.AddScoped<SyncSpace.Application.Common.Interfaces.IOpenAIService, SyncSpace.Infrastructure.Services.OpenAIService>();
         services.AddScoped<SyncSpace.Application.Common.Interfaces.IAdminService, SyncSpace.Infrastructure.Services.AdminService>();
         services.AddHttpContextAccessor();

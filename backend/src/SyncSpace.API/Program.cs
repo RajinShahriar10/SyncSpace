@@ -59,7 +59,7 @@ builder.Services.AddCors(options =>
     {
         var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ??
             new[] { "http://localhost:3000" };
-        var extraOrigins = new[] { "https://syncspace-work.vercel.app" };
+        var extraOrigins = new[] { "https://syncspace-work.vercel.app", "https://extension-strips-companies-spirituality.trycloudflare.com" };
         var allOrigins = origins.Concat(extraOrigins).Distinct().ToArray();
 
         policy.WithOrigins(allOrigins)
