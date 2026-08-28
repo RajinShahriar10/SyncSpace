@@ -14,10 +14,9 @@ export default function JoinWorkspacePage() {
   const router = useRouter();
   const token = params.token as string;
 
-  const { isAuthenticated, isLoading: authLoading } = useAuthStore();
+  const { isAuthenticated, isLoading: authLoading, initializeAuth } = useAuthStore();
   const [status, setStatus] = useState<"loading" | "done" | "error">("loading");
   const [message, setMessage] = useState("");
-  const [workspaceName, setWorkspaceName] = useState("");
 
   const performJoin = async () => {
     setStatus("loading");
@@ -25,20 +24,17 @@ export default function JoinWorkspacePage() {
       const member = await joinWorkspace(token);
       setStatus("done");
       setMessage("You joined the workspace successfully!");
-      setWorkspaceName("");
-      const pending = localStorage.getItem("pendingJoinWorkspace");
-      if (pending) {
-        localStorage.removeItem("pendingJoinWorkspace");
-      }
       setTimeout(() => router.push("/workspaces"), 1200);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to join workspace";
       setStatus("error");
-      setMessage(msg === "You are already a member of this workspace."
-        ? "You are already a member of this workspace."
-        : msg);
+      setMessage(msg);
     }
   };
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   useEffect(() => {
     if (!authLoading && isAuthenticated && token) {
