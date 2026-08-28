@@ -14,6 +14,9 @@ using SyncSpace.Persistence.Context;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
+builder.WebHost.UseUrls($"http://+:{port}");
+
 // Production logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -59,7 +62,7 @@ builder.Services.AddCors(options =>
     {
         var origins = builder.Configuration.GetSection("Cors:Origins").Get<string[]>() ??
             new[] { "http://localhost:3000" };
-        var extraOrigins = new[] { "https://syncspace-work.vercel.app", "https://myspace-tracked-devices-bizarre.trycloudflare.com" };
+        var extraOrigins = new[] { "https://syncspace-work.vercel.app", "https://carrier-sudden-purpose-senate.trycloudflare.com" };
         var allOrigins = origins.Concat(extraOrigins).Distinct().ToArray();
 
         policy.WithOrigins(allOrigins)
