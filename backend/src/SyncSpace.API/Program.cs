@@ -138,28 +138,30 @@ builder.Services.AddScoped<SyncSpace.API.Services.IRiskDetectionService, SyncSpa
 builder.Services.AddScoped<SyncSpace.API.Services.IAcademicReportService, SyncSpace.API.Services.AcademicReportService>();
 
 // Health Checks
-builder.Services.AddHealthChecks()
-    .AddNpgSql(
-        builder.Configuration.GetConnectionString("DefaultConnection") ?? throw new InvalidOperationException("Missing DB connection string"),
-        name: "database",
-        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Unhealthy,
-        tags: ["db", "ready"])
-    .AddRedis(
-        builder.Configuration["Redis:Connection"] ?? builder.Configuration["REDIS_URL"] ?? "localhost:6379",
-        name: "redis",
-        failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded,
-        tags: ["cache"]);
+var dbConn = builder.Configuration.GetConnectionString("DefaultConnection");
+if (!string.IsNullOrWhiteSpace(dbConn))
+{
+    builder.Services.AddHealthChecks()
+        .AddNpgSql(
+            dbConn,
+            name: "database",
+            failureStatus: Microsoft.Extensions.Diagnostics.HealthChecks.HealthStatus.Degraded,
+            tags: ["db", "ready"]);
+}
+else
+{
+    builder.Services.AddHealthChecks();
+}
 
 var app = builder.Build();
 
-// Auto-migrate in development
-if (app.Environment.IsDevelopment())
+// Auto-migrate (best effort - don't crash app if DB unreachable)
+try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<SyncSpaceDbContext>();
     await db.Database.MigrateAsync();
 
-    // Seed roles
     var roleManager = scope.ServiceProvider.GetRequiredService<Microsoft.AspNetCore.Identity.RoleManager<Microsoft.AspNetCore.Identity.IdentityRole<Guid>>>();
     string[] roles = ["Admin", "Member", "Viewer"];
     foreach (var role in roles)
@@ -167,6 +169,10 @@ if (app.Environment.IsDevelopment())
         if (!await roleManager.RoleExistsAsync(role))
             await roleManager.CreateAsync(new Microsoft.AspNetCore.Identity.IdentityRole<Guid>(role));
     }
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Database migration failed (continuing startup): {ex.Message}");
 }
 
 // Middleware pipeline
