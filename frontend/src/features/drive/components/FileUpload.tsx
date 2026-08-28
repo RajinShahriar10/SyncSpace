@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
-import { Upload, X, FileText, Image, File } from "lucide-react";
+import { Upload, X, FileText, Image, File, AlertCircle } from "lucide-react";
 import { useDriveStore } from "@/features/drive/stores/driveStore";
 import { Button } from "@/components/ui/button";
 
@@ -11,9 +11,10 @@ interface Props {
 }
 
 export default function FileUpload({ workspaceId, folderPath }: Props) {
-  const { isUploading, uploadProgress, uploadFiles } = useDriveStore();
+  const { isUploading, uploadProgress, uploadFiles, error } = useDriveStore();
   const [isDragOver, setIsDragOver] = useState(false);
   const [pendingFiles, setPendingFiles] = useState<File[]>([]);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFiles = useCallback((fileList: FileList) => {
@@ -28,8 +29,14 @@ export default function FileUpload({ workspaceId, folderPath }: Props) {
 
   const handleUpload = async () => {
     if (pendingFiles.length === 0) return;
-    await uploadFiles(workspaceId, pendingFiles, folderPath);
-    setPendingFiles([]);
+    setUploadError(null);
+    try {
+      await uploadFiles(workspaceId, pendingFiles, folderPath);
+      setPendingFiles([]);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : uploadError ?? "Upload failed";
+      setUploadError(msg);
+    }
   };
 
   const formatSize = (bytes: number) => {
@@ -69,6 +76,13 @@ export default function FileUpload({ workspaceId, folderPath }: Props) {
         </p>
         <p className="text-xs text-zinc-500">Supports images, PDFs, documents up to 100 MB</p>
       </div>
+
+      {uploadError && (
+        <div className="mt-3 flex items-start gap-2 rounded-lg border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>{uploadError}</span>
+        </div>
+      )}
 
       {pendingFiles.length > 0 && (
         <div className="mt-3 space-y-2">

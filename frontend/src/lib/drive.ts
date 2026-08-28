@@ -1,4 +1,5 @@
 import api from "./api";
+import axios from "axios";
 
 export interface DriveFileDto {
   id: string;
@@ -85,10 +86,25 @@ export async function uploadFile(
   if (folderPath) q.set("folderPath", folderPath);
   if (description) q.set("description", description);
   if (tags) q.set("tags", tags);
-  const res = await api.post<{ data: DriveFileDto }>(`/file/upload?${q}`, formData, {
-    headers: { "Content-Type": "multipart/form-data" },
-  });
-  return res.data.data;
+  try {
+    const res = await api.post<{ data: DriveFileDto }>(`/file/upload?${q}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    return res.data.data;
+  } catch (err) {
+    throw new Error(extractError(err));
+  }
+}
+
+function extractError(err: unknown): string {
+  if (axios.isAxiosError(err)) {
+    const message =
+      (err.response?.data as { message?: string })?.message ??
+      (err.response?.data as { errors?: string[] })?.errors?.[0];
+    if (message) return message;
+    if (err.code === "ECONNABORTED") return "Request timed out.";
+  }
+  return err instanceof Error && err.message ? err.message : "Upload failed.";
 }
 
 export async function updateFile(fileId: string, data: { description?: string; tags?: string; folderPath?: string }): Promise<DriveFileDto> {

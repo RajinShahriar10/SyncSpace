@@ -94,7 +94,7 @@ export const useDriveStore = create<DriveState>((set, get) => ({
   closePreview: () => set({ previewFile: null }),
 
   uploadFiles: async (workspaceId, files, folderPath) => {
-    set({ isUploading: true, uploadProgress: 0 });
+    set({ isUploading: true, uploadProgress: 0, error: null });
     try {
       for (let i = 0; i < files.length; i++) {
         await driveApi.uploadFile(workspaceId, files[i], folderPath);
@@ -103,7 +103,11 @@ export const useDriveStore = create<DriveState>((set, get) => ({
       set({ isUploading: false, uploadProgress: 0 });
       await get().fetchFiles(workspaceId);
       await get().fetchStats(workspaceId);
-    } catch { set({ isUploading: false, uploadProgress: 0 }); }
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Upload failed. Please try again.";
+      set({ isUploading: false, uploadProgress: 0, error: msg });
+      throw err;
+    }
   },
 
   deleteFile: async (fileId) => {
