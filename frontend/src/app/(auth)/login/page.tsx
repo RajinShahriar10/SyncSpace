@@ -46,7 +46,13 @@ function LoginForm() {
     setError(null);
     try {
       await login(data.email, data.password, data.rememberMe);
-      router.push("/dashboard");
+      const pending = localStorage.getItem("pendingJoinWorkspace");
+      if (pending) {
+        localStorage.removeItem("pendingJoinWorkspace");
+        router.push(`/join/${pending}`);
+      } else {
+        router.push("/dashboard");
+      }
     } catch {
       // Error is set in the store
     } finally {

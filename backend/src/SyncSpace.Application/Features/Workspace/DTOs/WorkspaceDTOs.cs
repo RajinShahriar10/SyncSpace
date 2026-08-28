@@ -33,6 +33,16 @@ public record InviteMemberCommand : IRequest<ApiResponse<WorkspaceMemberDto>>
     public string Role { get; init; } = "Editor";
 }
 
+public record GenerateJoinLinkCommand : IRequest<ApiResponse<string>>
+{
+    public Guid WorkspaceId { get; init; }
+}
+
+public record JoinWorkspaceCommand : IRequest<ApiResponse<WorkspaceMemberDto>>
+{
+    public string Token { get; init; } = string.Empty;
+}
+
 public record RemoveMemberCommand : IRequest<ApiResponse<bool>>
 {
     public Guid WorkspaceId { get; init; }

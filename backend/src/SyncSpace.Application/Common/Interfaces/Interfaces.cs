@@ -112,3 +112,9 @@ public interface IEmailService
 {
     Task SendAsync(string to, string subject, string body, CancellationToken cancellationToken = default);
 }
+
+public interface IJoinLinkService
+{
+    string GenerateJoinToken(Guid workspaceId);
+    Guid? ValidateJoinToken(string token);
+}

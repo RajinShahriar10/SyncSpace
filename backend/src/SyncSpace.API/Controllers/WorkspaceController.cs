@@ -70,6 +70,24 @@ public class WorkspaceController : ControllerBase
 
     // --- Members ---
 
+    [HttpPost("{workspaceId:guid}/join-link")]
+    [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GenerateJoinLink(Guid workspaceId)
+    {
+        var result = await _mediator.Send(new GenerateJoinLinkCommand { WorkspaceId = workspaceId });
+        return result.Success ? Ok(result) : result.StatusCode == System.Net.HttpStatusCode.Forbidden
+            ? StatusCode(403, result)
+            : NotFound(result);
+    }
+
+    [HttpPost("join")]
+    [ProducesResponseType(typeof(ApiResponse<WorkspaceMemberDto>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> JoinWorkspace([FromBody] JoinWorkspaceCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return result.Success ? Ok(result) : BadRequest(result);
+    }
+
     [HttpGet("{workspaceId:guid}/members")]
     [ProducesResponseType(typeof(ApiResponse<List<WorkspaceMemberDto>>), StatusCodes.Status200OK)]
     public async Task<IActionResult> GetMembers(Guid workspaceId)

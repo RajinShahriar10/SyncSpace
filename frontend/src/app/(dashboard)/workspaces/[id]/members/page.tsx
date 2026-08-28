@@ -9,7 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Input } from "@/components/ui/input";
 import { useWorkspaceStore } from "@/features/workspace/stores/workspaceStore";
 import { useAuthStore } from "@/store";
-import { ArrowLeft, UserPlus, X, Shield, Edit3, Eye, Crown } from "lucide-react";
+import { generateJoinLink } from "@/lib/workspace";
+import { ArrowLeft, UserPlus, X, Shield, Edit3, Eye, Crown, Link2, Copy, Check } from "lucide-react";
 
 const ROLES = [
   { value: "Admin", label: "Instructor", icon: Shield, desc: "Full access except delete" },
@@ -45,6 +46,10 @@ export default function WorkspaceMembersPage() {
   const [inviting, setInviting] = useState(false);
   const [error, setError] = useState("");
 
+  const [joinLink, setJoinLink] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+
   useEffect(() => {
     fetchWorkspace(workspaceId);
     fetchMembers(workspaceId);
@@ -62,6 +67,32 @@ export default function WorkspaceMembersPage() {
       setError(message);
     } finally {
       setInviting(false);
+    }
+  };
+
+  const handleGenerateLink = async () => {
+    setGenerating(true);
+    setError("");
+    try {
+      const token = await generateJoinLink(workspaceId);
+      setJoinLink(`${window.location.origin}/join/${token}`);
+      setCopied(false);
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "Failed to generate link";
+      setError(message);
+    } finally {
+      setGenerating(false);
+    }
+  };
+
+  const handleCopyLink = async () => {
+    if (!joinLink) return;
+    try {
+      await navigator.clipboard.writeText(joinLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
     }
   };
 
@@ -91,6 +122,45 @@ export default function WorkspaceMembersPage() {
           <p className="text-muted-foreground">
             Manage who has access to {currentWorkspace?.name || "this project"}
           </p>
+        </motion.div>
+
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Link2 className="h-4 w-4 text-primary" />
+                Join Link
+              </CardTitle>
+              <CardDescription>
+                Share this link to let others join this project as a member
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {joinLink ? (
+                <div className="flex flex-col sm:flex-row gap-2">
+                  <div className="flex flex-1 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
+                    <Link2 className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    <span className="truncate text-sm text-foreground">{joinLink}</span>
+                  </div>
+                  <Button onClick={handleCopyLink} variant="outline" className="gap-2 shrink-0">
+                    {copied ? <Check className="h-4 w-4 text-emerald-400" /> : <Copy className="h-4 w-4" />}
+                    {copied ? "Copied!" : "Copy"}
+                  </Button>
+                  <Button onClick={handleGenerateLink} variant="ghost" disabled={generating} className="shrink-0">
+                    Regenerate
+                  </Button>
+                </div>
+              ) : (
+                <Button onClick={handleGenerateLink} disabled={generating} className="gap-2">
+                  <Link2 className="h-4 w-4" />
+                  {generating ? "Generating..." : "Generate Join Link"}
+                </Button>
+              )}
+              <p className="text-xs text-muted-foreground">
+                Link expires after 7 days. Anyone with the link can join this project as a Member.
+              </p>
+            </CardContent>
+          </Card>
         </motion.div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>

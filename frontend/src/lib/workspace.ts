@@ -97,3 +97,13 @@ export async function updateMemberRole(
   );
   return response.data.data;
 }
+
+export async function generateJoinLink(workspaceId: string): Promise<string> {
+  const response = await api.post<{ data: string }>(`/workspace/${workspaceId}/join-link`);
+  return response.data.data;
+}
+
+export async function joinWorkspace(token: string): Promise<WorkspaceMember> {
+  const response = await api.post<{ data: WorkspaceMember }>("/workspace/join", { token });
+  return response.data.data;
+}

@@ -99,6 +99,7 @@ public static class DependencyInjection
         services.AddScoped<SyncSpace.Application.Common.Interfaces.ISearchService, SyncSpace.Infrastructure.Services.SearchService>();
         services.AddScoped<SyncSpace.Application.Common.Interfaces.IAuditService, SyncSpace.Infrastructure.Services.AuditService>();
         services.AddScoped<SyncSpace.Application.Common.Interfaces.IAnalyticsService, SyncSpace.Infrastructure.Services.AnalyticsService>();
+        services.AddScoped<SyncSpace.Application.Common.Interfaces.IJoinLinkService, SyncSpace.Infrastructure.Services.JoinLinkService>();
 
         // Register cached decorators only if Redis is available
         var redisConn = configuration["Redis:Connection"] ?? configuration["REDIS_URL"];

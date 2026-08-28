@@ -264,6 +264,123 @@ public class RemoveMemberCommandHandler : IRequestHandler<RemoveMemberCommand, A
     }
 }
 
+// --- Generate Join Link ---
+
+public class GenerateJoinLinkCommandHandler : IRequestHandler<GenerateJoinLinkCommand, ApiResponse<string>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUserService _currentUser;
+    private readonly IJoinLinkService _joinLinkService;
+
+    public GenerateJoinLinkCommandHandler(
+        IUnitOfWork unitOfWork,
+        ICurrentUserService currentUser,
+        IJoinLinkService joinLinkService)
+    {
+        _unitOfWork = unitOfWork;
+        _currentUser = currentUser;
+        _joinLinkService = joinLinkService;
+    }
+
+    public async Task<ApiResponse<string>> Handle(GenerateJoinLinkCommand request, CancellationToken ct)
+    {
+        var userId = _currentUser.UserId;
+        if (userId == null)
+            return ApiResponse<string>.Failure("Unauthorized.", System.Net.HttpStatusCode.Unauthorized);
+
+        var wsRepo = _unitOfWork.Repository<Domain.Entities.Workspace>();
+        var workspace = await wsRepo.GetByIdAsync(request.WorkspaceId, ct);
+        if (workspace == null)
+            return ApiResponse<string>.NotFound("Workspace not found.");
+
+        if (workspace.OwnerId != userId.Value &&
+            !await WorkspaceAuthorization.HasRole(_unitOfWork, userId.Value, request.WorkspaceId, WorkspaceRole.Admin))
+            return ApiResponse<string>.Failure("Only the owner or an admin can generate a join link.", System.Net.HttpStatusCode.Forbidden);
+
+        var token = _joinLinkService.GenerateJoinToken(request.WorkspaceId);
+        return ApiResponse<string>.SuccessResponse(token, "Join link generated.");
+    }
+}
+
+// --- Join Workspace via Link ---
+
+public class JoinWorkspaceCommandHandler : IRequestHandler<JoinWorkspaceCommand, ApiResponse<WorkspaceMemberDto>>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ICurrentUserService _currentUser;
+    private readonly IIdentityService _identityService;
+    private readonly IJoinLinkService _joinLinkService;
+
+    public JoinWorkspaceCommandHandler(
+        IUnitOfWork unitOfWork,
+        ICurrentUserService currentUser,
+        IIdentityService identityService,
+        IJoinLinkService joinLinkService)
+    {
+        _unitOfWork = unitOfWork;
+        _currentUser = currentUser;
+        _identityService = identityService;
+        _joinLinkService = joinLinkService;
+    }
+
+    public async Task<ApiResponse<WorkspaceMemberDto>> Handle(JoinWorkspaceCommand request, CancellationToken ct)
+    {
+        var userId = _currentUser.UserId;
+        if (userId == null)
+            return ApiResponse<WorkspaceMemberDto>.Failure("Unauthorized.", System.Net.HttpStatusCode.Unauthorized);
+
+        var workspaceId = _joinLinkService.ValidateJoinToken(request.Token);
+        if (workspaceId == null)
+            return ApiResponse<WorkspaceMemberDto>.Failure("The join link is invalid or has expired.");
+
+        var wsRepo = _unitOfWork.Repository<Domain.Entities.Workspace>();
+        var workspace = await wsRepo.GetByIdAsync(workspaceId.Value, ct);
+        if (workspace == null)
+            return ApiResponse<WorkspaceMemberDto>.NotFound("Workspace not found.");
+
+        var memberRepo = _unitOfWork.Repository<Domain.Entities.WorkspaceMember>();
+        var existingMember = (await memberRepo.GetAllAsync(ct))
+            .FirstOrDefault(m => m.UserId == userId.Value && m.WorkspaceId == workspaceId.Value);
+        if (existingMember != null)
+        {
+            var userInfo = await _identityService.GetUserInfoAsync(userId.Value);
+            return ApiResponse<WorkspaceMemberDto>.SuccessResponse(new WorkspaceMemberDto
+            {
+                Id = existingMember.Id,
+                UserId = existingMember.UserId,
+                UserEmail = userInfo?.Email ?? "",
+                UserName = userInfo != null ? userInfo.FirstName + " " + userInfo.LastName : "",
+                UserAvatarUrl = userInfo?.AvatarUrl,
+                Role = existingMember.Role.ToString(),
+                JoinedAt = existingMember.CreatedAt
+            }, "You are already a member of this workspace.");
+        }
+
+        var member = new WorkspaceMember
+        {
+            UserId = userId.Value,
+            WorkspaceId = workspaceId.Value,
+            Role = WorkspaceRole.Editor,
+            CreatedBy = userId.Value.ToString()
+        };
+
+        await memberRepo.AddAsync(member, ct);
+        await _unitOfWork.SaveChangesAsync(ct);
+
+        var info = await _identityService.GetUserInfoAsync(userId.Value);
+        return ApiResponse<WorkspaceMemberDto>.SuccessResponse(new WorkspaceMemberDto
+        {
+            Id = member.Id,
+            UserId = member.UserId,
+            UserEmail = info?.Email ?? "",
+            UserName = info != null ? info.FirstName + " " + info.LastName : "",
+            UserAvatarUrl = info?.AvatarUrl,
+            Role = member.Role.ToString(),
+            JoinedAt = member.CreatedAt
+        }, "You joined the workspace successfully.");
+    }
+}
+
 // --- Update Member Role ---
 
 public class UpdateMemberRoleCommandHandler : IRequestHandler<UpdateMemberRoleCommand, ApiResponse<WorkspaceMemberDto>>
