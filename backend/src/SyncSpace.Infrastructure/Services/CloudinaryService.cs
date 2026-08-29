@@ -7,8 +7,9 @@ namespace SyncSpace.Infrastructure.Services;
 
 public class CloudinaryService : ICloudinaryService
 {
-    private readonly Cloudinary _cloudinary;
+    private readonly Cloudinary? _cloudinary;
     private readonly string _workspaceFolder;
+    private readonly string _configError;
 
     public CloudinaryService(IConfiguration configuration)
     {
@@ -16,12 +17,28 @@ public class CloudinaryService : ICloudinaryService
         var apiKey = configuration["Cloudinary:ApiKey"] ?? "";
         var apiSecret = configuration["Cloudinary:ApiSecret"] ?? "";
 
-        var account = new Account(cloudName, apiKey, apiSecret);
-        _cloudinary = new Cloudinary(account);
+        if (string.IsNullOrWhiteSpace(cloudName) || string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(apiSecret))
+        {
+            _cloudinary = null;
+            _configError = "Cloudinary is not configured. Set Cloudinary:CloudName, Cloudinary:ApiKey and Cloudinary:ApiSecret.";
+            _workspaceFolder = configuration["Cloudinary:Folder"] ?? "SyncSpace";
+            return;
+        }
+
+        _cloudinary = new Cloudinary(new Account(cloudName, apiKey, apiSecret));
+        _cloudinary.Api.Secure = true;
         _workspaceFolder = configuration["Cloudinary:Folder"] ?? "SyncSpace";
+        _configError = "";
     }
 
-    public async Task<CloudinaryUploadResult> UploadFileAsync(Stream fileStream, string filename, string folder, CancellationToken ct = default)
+    public Task<CloudinaryUploadResult> UploadFileAsync(Stream fileStream, string filename, string folder, CancellationToken ct = default)
+    {
+        if (_cloudinary == null)
+            return Task.FromResult(new CloudinaryUploadResult { Success = false, Error = _configError });
+        return UploadFileCoreAsync(fileStream, filename, folder, ct);
+    }
+
+    private async Task<CloudinaryUploadResult> UploadFileCoreAsync(Stream fileStream, string filename, string folder, CancellationToken ct)
     {
         try
         {
@@ -33,7 +50,7 @@ public class CloudinaryService : ICloudinaryService
                 Overwrite = false
             };
 
-            var result = await _cloudinary.UploadAsync(uploadParams);
+            var result = await _cloudinary!.UploadAsync(uploadParams);
 
             if (result.Error != null)
                 return new CloudinaryUploadResult { Success = false, Error = result.Error.Message };
@@ -53,7 +70,14 @@ public class CloudinaryService : ICloudinaryService
         }
     }
 
-    public async Task<CloudinaryUploadResult> UploadImageAsync(Stream fileStream, string filename, string folder, int? maxWidth = null, int? maxHeight = null, CancellationToken ct = default)
+    public Task<CloudinaryUploadResult> UploadImageAsync(Stream fileStream, string filename, string folder, int? maxWidth = null, int? maxHeight = null, CancellationToken ct = default)
+    {
+        if (_cloudinary == null)
+            return Task.FromResult(new CloudinaryUploadResult { Success = false, Error = _configError });
+        return UploadImageCoreAsync(fileStream, filename, folder, maxWidth, maxHeight, ct);
+    }
+
+    private async Task<CloudinaryUploadResult> UploadImageCoreAsync(Stream fileStream, string filename, string folder, int? maxWidth, int? maxHeight, CancellationToken ct)
     {
         try
         {
@@ -66,7 +90,7 @@ public class CloudinaryService : ICloudinaryService
                 Transformation = BuildTransformation(maxWidth, maxHeight)
             };
 
-            var result = await _cloudinary.UploadAsync(uploadParams);
+            var result = await _cloudinary!.UploadAsync(uploadParams);
 
             if (result.Error != null)
                 return new CloudinaryUploadResult { Success = false, Error = result.Error.Message };
@@ -91,11 +115,18 @@ public class CloudinaryService : ICloudinaryService
         }
     }
 
-    public async Task<bool> DeleteFileAsync(string publicId, CancellationToken ct = default)
+    public Task<bool> DeleteFileAsync(string publicId, CancellationToken ct = default)
+    {
+        if (_cloudinary == null)
+            return Task.FromResult(false);
+        return DeleteFileCoreAsync(publicId, ct);
+    }
+
+    private async Task<bool> DeleteFileCoreAsync(string publicId, CancellationToken ct)
     {
         try
         {
-            var result = await _cloudinary.DestroyAsync(new DeletionParams(publicId));
+            var result = await _cloudinary!.DestroyAsync(new DeletionParams(publicId));
             return result.Result == "ok";
         }
         catch
@@ -106,11 +137,12 @@ public class CloudinaryService : ICloudinaryService
 
     public string GetDownloadUrl(string publicId)
     {
-        return _cloudinary.Api.UrlImgUp.BuildUrl(publicId);
+        return _cloudinary?.Api.UrlImgUp.BuildUrl(publicId) ?? "";
     }
 
     public string GetPreviewUrl(string publicId, int? width = null, int? height = null)
     {
+        if (_cloudinary == null) return "";
         var transformation = new Transformation();
         if (width.HasValue) transformation.Width(width.Value);
         if (height.HasValue) transformation.Height(height.Value);
@@ -120,6 +152,7 @@ public class CloudinaryService : ICloudinaryService
 
     public string GetThumbnailUrl(string publicId, int size = 200)
     {
+        if (_cloudinary == null) return "";
         return _cloudinary.Api.UrlImgUp
             .Transform(new Transformation().Width(size).Height(size).Crop("fill").Gravity("auto"))
             .BuildUrl(publicId);
