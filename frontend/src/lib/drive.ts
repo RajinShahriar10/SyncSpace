@@ -87,9 +87,7 @@ export async function uploadFile(
   if (description) q.set("description", description);
   if (tags) q.set("tags", tags);
   try {
-    const res = await api.post<{ data: DriveFileDto }>(`/file/upload?${q}`, formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    const res = await api.post<{ data: DriveFileDto }>(`/file/upload?${q}`, formData);
     return res.data.data;
   } catch (err) {
     throw new Error(extractError(err));

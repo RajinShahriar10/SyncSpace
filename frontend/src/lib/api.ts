@@ -11,6 +11,14 @@ export const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
+  if (config.data instanceof FormData) {
+    delete config.headers["Content-Type"];
+    Object.keys(config.headers).forEach((k) => {
+      if (k.toLowerCase() === "content-type") {
+        delete config.headers[k];
+      }
+    });
+  }
   if (typeof window !== "undefined") {
     const token = localStorage.getItem("access_token");
     if (token) {
