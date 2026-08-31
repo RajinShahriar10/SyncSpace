@@ -38,7 +38,7 @@ import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useReportStore } from "@/features/reports/stores/reportStore";
-import { exportToPDF, exportStudentReportToExcel } from "@/lib/export";
+import { exportStudentReportToPDF, exportStudentReportToExcel } from "@/lib/export";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 12 },
@@ -86,7 +86,9 @@ export default function StudentReportPage() {
   }, [loadReport]);
 
   const handlePrint = () => {
-    exportToPDF("printable-report", "Student Report");
+    if (studentReport) {
+      exportStudentReportToPDF(studentReport);
+    }
   };
 
   const handleExportExcel = () => {
