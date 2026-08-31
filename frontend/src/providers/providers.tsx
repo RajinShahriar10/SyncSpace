@@ -3,8 +3,9 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "sonner";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { NotificationProvider } from "./notification-provider";
+import { useAuthStore } from "@/store";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -19,6 +20,12 @@ export function Providers({ children }: { children: ReactNode }) {
         },
       })
   );
+
+  const initializeAuth = useAuthStore((s) => s.initializeAuth);
+
+  useEffect(() => {
+    initializeAuth();
+  }, [initializeAuth]);
 
   return (
     <QueryClientProvider client={queryClient}>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { motion } from "framer-motion";
 import {
@@ -20,6 +20,7 @@ import {
   Shield,
   Trophy,
   BookOpen,
+  AlertTriangle,
 } from "lucide-react";
 import {
   AreaChart,
@@ -72,13 +73,17 @@ export default function StudentReportPage() {
   const params = useParams();
   const userId = params.id as string;
 
-  const { fetchStudentReport, studentReport, isLoading } = useReportStore();
+  const { fetchStudentReport, studentReport, isLoading, error } = useReportStore();
 
-  useEffect(() => {
+  const loadReport = useCallback(() => {
     if (userId) {
       fetchStudentReport(userId);
     }
   }, [userId, fetchStudentReport]);
+
+  useEffect(() => {
+    loadReport();
+  }, [loadReport]);
 
   const handlePrint = () => {
     exportToPDF("printable-report", "Student Report");
@@ -117,6 +122,27 @@ export default function StudentReportPage() {
   };
 
   if (isLoading || !studentReport) {
+    if (!isLoading && error && !studentReport) {
+      return (
+        <DashboardLayout>
+          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 px-6 text-center">
+            <AlertTriangle className="h-12 w-12 text-[#F43F5E]" />
+            <div>
+              <h1 className="text-lg font-semibold text-white">Report Unavailable</h1>
+              <p className="mt-1 max-w-md text-sm text-zinc-400">{error}</p>
+            </div>
+            <Button
+              onClick={loadReport}
+              variant="outline"
+              className="border-zinc-800 text-zinc-300 hover:bg-white/5 hover:text-white"
+            >
+              Try Again
+            </Button>
+          </div>
+        </DashboardLayout>
+      );
+    }
+
     return (
       <DashboardLayout>
         <div className="flex items-center justify-center min-h-[60vh]">
