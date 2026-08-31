@@ -72,9 +72,9 @@ public class WorkspaceController : ControllerBase
 
     [HttpPost("{workspaceId:guid}/join-link")]
     [ProducesResponseType(typeof(ApiResponse<string>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GenerateJoinLink(Guid workspaceId)
+    public async Task<IActionResult> GenerateJoinLink(Guid workspaceId, [FromQuery] int role = 2)
     {
-        var result = await _mediator.Send(new GenerateJoinLinkCommand { WorkspaceId = workspaceId });
+        var result = await _mediator.Send(new GenerateJoinLinkCommand { WorkspaceId = workspaceId, Role = role });
         return result.Success ? Ok(result) : result.StatusCode == System.Net.HttpStatusCode.Forbidden
             ? StatusCode(403, result)
             : NotFound(result);

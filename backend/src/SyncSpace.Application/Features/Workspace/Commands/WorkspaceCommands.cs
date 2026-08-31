@@ -297,7 +297,7 @@ public class GenerateJoinLinkCommandHandler : IRequestHandler<GenerateJoinLinkCo
             !await WorkspaceAuthorization.HasRole(_unitOfWork, userId.Value, request.WorkspaceId, WorkspaceRole.Admin))
             return ApiResponse<string>.Failure("Only the owner or an admin can generate a join link.", System.Net.HttpStatusCode.Forbidden);
 
-        var token = _joinLinkService.GenerateJoinToken(request.WorkspaceId);
+        var token = _joinLinkService.GenerateJoinToken(request.WorkspaceId, request.Role);
         return ApiResponse<string>.SuccessResponse(token, "Join link generated.");
     }
 }
@@ -329,18 +329,20 @@ public class JoinWorkspaceCommandHandler : IRequestHandler<JoinWorkspaceCommand,
         if (userId == null)
             return ApiResponse<WorkspaceMemberDto>.Failure("Unauthorized.", System.Net.HttpStatusCode.Unauthorized);
 
-        var workspaceId = _joinLinkService.ValidateJoinToken(request.Token);
-        if (workspaceId == null)
+        var joinPayload = _joinLinkService.ValidateJoinToken(request.Token);
+        if (joinPayload == null)
             return ApiResponse<WorkspaceMemberDto>.Failure("The join link is invalid or has expired.");
 
+        var workspaceId = joinPayload.WorkspaceId;
+
         var wsRepo = _unitOfWork.Repository<Domain.Entities.Workspace>();
-        var workspace = await wsRepo.GetByIdAsync(workspaceId.Value, ct);
+        var workspace = await wsRepo.GetByIdAsync(workspaceId, ct);
         if (workspace == null)
             return ApiResponse<WorkspaceMemberDto>.NotFound("Workspace not found.");
 
         var memberRepo = _unitOfWork.Repository<Domain.Entities.WorkspaceMember>();
         var existingMember = (await memberRepo.GetAllAsync(ct))
-            .FirstOrDefault(m => m.UserId == userId.Value && m.WorkspaceId == workspaceId.Value);
+            .FirstOrDefault(m => m.UserId == userId.Value && m.WorkspaceId == workspaceId);
         if (existingMember != null)
         {
             var userInfo = await _identityService.GetUserInfoAsync(userId.Value);
@@ -359,8 +361,8 @@ public class JoinWorkspaceCommandHandler : IRequestHandler<JoinWorkspaceCommand,
         var member = new WorkspaceMember
         {
             UserId = userId.Value,
-            WorkspaceId = workspaceId.Value,
-            Role = WorkspaceRole.Editor,
+            WorkspaceId = workspaceId,
+            Role = (WorkspaceRole)joinPayload.Role,
             CreatedBy = userId.Value.ToString()
         };
 

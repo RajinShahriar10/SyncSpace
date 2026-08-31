@@ -49,6 +49,7 @@ export default function WorkspaceMembersPage() {
   const [joinLink, setJoinLink] = useState("");
   const [copied, setCopied] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [joinRole, setJoinRole] = useState("Editor");
 
   useEffect(() => {
     fetchWorkspace(workspaceId);
@@ -74,7 +75,7 @@ export default function WorkspaceMembersPage() {
     setGenerating(true);
     setError("");
     try {
-      const token = await generateJoinLink(workspaceId);
+      const token = await generateJoinLink(workspaceId, joinRole);
       setJoinLink(`${window.location.origin}/join/${token}`);
       setCopied(false);
     } catch (err: unknown) {
@@ -136,6 +137,24 @@ export default function WorkspaceMembersPage() {
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
+              {!joinLink && (
+                <div className="flex flex-wrap gap-2">
+                  {ROLES.map((r) => (
+                    <button
+                      key={r.value}
+                      onClick={() => setJoinRole(r.value)}
+                      className={`flex items-center gap-2 rounded-lg px-3 py-2 text-sm transition-all ${
+                        joinRole === r.value
+                          ? "bg-primary/10 text-primary ring-1 ring-primary/30"
+                          : "bg-white/5 text-muted-foreground hover:bg-white/10"
+                      }`}
+                    >
+                      <r.icon className="h-3.5 w-3.5" />
+                      {r.label}
+                    </button>
+                  ))}
+                </div>
+              )}
               {joinLink ? (
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex flex-1 items-center gap-2 rounded-lg border border-white/10 bg-white/5 px-3 py-2">
@@ -157,7 +176,7 @@ export default function WorkspaceMembersPage() {
                 </Button>
               )}
               <p className="text-xs text-muted-foreground">
-                Link expires after 7 days. Anyone with the link can join this project as a Member.
+                Link expires after 7 days. Anyone with the link joins this project as {ROLES.find((r) => r.value === joinRole)?.label || "Member"}.
               </p>
             </CardContent>
           </Card>

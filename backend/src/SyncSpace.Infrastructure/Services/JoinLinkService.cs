@@ -15,17 +15,17 @@ public class JoinLinkService : IJoinLinkService
         _signingKey = configuration["Jwt:Key"] ?? "SyncSpaceJoinLinkDefaultKey";
     }
 
-    public string GenerateJoinToken(Guid workspaceId)
+    public string GenerateJoinToken(Guid workspaceId, int role)
     {
         var expires = DateTimeOffset.UtcNow.Add(TokenLifetime).ToUnixTimeSeconds();
-        var payload = $"{workspaceId:N}|{expires}";
+        var payload = $"{workspaceId:N}|{role}|{expires}";
         var signature = Sign(payload);
 
         var data = Convert.ToBase64String(Encoding.UTF8.GetBytes(payload + "|" + signature));
         return data.TrimEnd('=').Replace('+', '-').Replace('/', '_');
     }
 
-    public Guid? ValidateJoinToken(string token)
+    public JoinLinkPayload? ValidateJoinToken(string token)
     {
         if (string.IsNullOrWhiteSpace(token))
             return null;
@@ -41,22 +41,25 @@ public class JoinLinkService : IJoinLinkService
 
             var decoded = Encoding.UTF8.GetString(Convert.FromBase64String(padded));
             var parts = decoded.Split('|');
-            if (parts.Length != 3)
+            if (parts.Length != 4)
                 return null;
 
-            var payload = $"{parts[0]}|{parts[1]}";
-            if (Sign(payload) != parts[2])
-                return null;
-
-            if (!long.TryParse(parts[1], out var expiresUnix))
-                return null;
-            if (DateTimeOffset.FromUnixTimeSeconds(expiresUnix).UtcDateTime < DateTime.UtcNow)
+            var payload = $"{parts[0]}|{parts[1]}|{parts[2]}";
+            if (Sign(payload) != parts[3])
                 return null;
 
             if (!Guid.TryParseExact(parts[0], "N", out var workspaceId))
                 return null;
 
-            return workspaceId;
+            if (!int.TryParse(parts[1], out var role))
+                return null;
+
+            if (!long.TryParse(parts[2], out var expiresUnix))
+                return null;
+            if (DateTimeOffset.FromUnixTimeSeconds(expiresUnix).UtcDateTime < DateTime.UtcNow)
+                return null;
+
+            return new JoinLinkPayload(workspaceId, role);
         }
         catch
         {

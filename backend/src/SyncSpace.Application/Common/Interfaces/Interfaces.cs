@@ -115,6 +115,8 @@ public interface IEmailService
 
 public interface IJoinLinkService
 {
-    string GenerateJoinToken(Guid workspaceId);
-    Guid? ValidateJoinToken(string token);
+    string GenerateJoinToken(Guid workspaceId, int role);
+    JoinLinkPayload? ValidateJoinToken(string token);
 }
+
+public record JoinLinkPayload(Guid WorkspaceId, int Role);

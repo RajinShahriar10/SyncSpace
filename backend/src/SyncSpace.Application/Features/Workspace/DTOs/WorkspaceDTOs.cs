@@ -1,5 +1,6 @@
 using MediatR;
 using SyncSpace.Application.Common.Models;
+using SyncSpace.Domain.Enums;
 
 namespace SyncSpace.Application.Features.Workspace.DTOs;
 
@@ -32,10 +33,11 @@ public record InviteMemberCommand : IRequest<ApiResponse<WorkspaceMemberDto>>
     public string Email { get; init; } = string.Empty;
     public string Role { get; init; } = "Editor";
 }
-
-public record GenerateJoinLinkCommand : IRequest<ApiResponse<string>>
+public record GenerateJoinLinkCommand
+    : IRequest<ApiResponse<string>>
 {
     public Guid WorkspaceId { get; init; }
+    public int Role { get; init; } = (int)WorkspaceRole.Editor;
 }
 
 public record JoinWorkspaceCommand : IRequest<ApiResponse<WorkspaceMemberDto>>

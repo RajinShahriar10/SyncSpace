@@ -98,8 +98,10 @@ export async function updateMemberRole(
   return response.data.data;
 }
 
-export async function generateJoinLink(workspaceId: string): Promise<string> {
-  const response = await api.post<{ data: string }>(`/workspace/${workspaceId}/join-link`);
+export async function generateJoinLink(workspaceId: string, role: string): Promise<string> {
+  const response = await api.post<{ data: string }>(
+    `/workspace/${workspaceId}/join-link?role=${encodeURIComponent(role)}`
+  );
   return response.data.data;
 }
 
