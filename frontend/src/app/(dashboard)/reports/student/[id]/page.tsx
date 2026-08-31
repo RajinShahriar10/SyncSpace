@@ -310,8 +310,8 @@ export default function StudentReportPage() {
           {/* Charts Row */}
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             {/* Activity Trend Chart */}
-            <motion.div variants={fadeIn}>
-              <Card className="border-zinc-800/60 bg-zinc-900/50">
+            <motion.div variants={fadeIn} className="min-w-0">
+              <Card className="h-full border-zinc-800/60 bg-zinc-900/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base text-white">
                     <BarChart3 className="h-4 w-4 text-[#6366f1]" />
@@ -322,7 +322,7 @@ export default function StudentReportPage() {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="h-64">
+                  <div className="h-64 w-full min-w-0">
                     <ResponsiveContainer width="100%" height="100%">
                       <AreaChart data={activityData}>
                         <defs>
@@ -379,8 +379,8 @@ export default function StudentReportPage() {
             </motion.div>
 
             {/* Contribution Breakdown */}
-            <motion.div variants={fadeIn}>
-              <Card className="border-zinc-800/60 bg-zinc-900/50">
+            <motion.div variants={fadeIn} className="min-w-0">
+              <Card className="h-full border-zinc-800/60 bg-zinc-900/50">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2 text-base text-white">
                     <Activity className="h-4 w-4 text-[#8B5CF6]" />
@@ -391,8 +391,8 @@ export default function StudentReportPage() {
                   </p>
                 </CardHeader>
                 <CardContent>
-                  <div className="flex items-center gap-6">
-                    <div className="h-64 w-64">
+                  <div className="flex min-w-0 flex-col items-center gap-6 sm:flex-row">
+                    <div className="h-64 w-full max-w-xs shrink-0 sm:w-64">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                           <Pie
@@ -425,7 +425,7 @@ export default function StudentReportPage() {
                         </PieChart>
                       </ResponsiveContainer>
                     </div>
-                    <div className="flex-1 space-y-3">
+                    <div className="min-w-0 flex-1 space-y-3">
                       {breakdownData.map(
                         (item: { name: string; value: number }, index: number) => (
                           <div
@@ -465,8 +465,7 @@ export default function StudentReportPage() {
                   <FileText className="h-4 w-4 text-[#06B6D4]" />
                   Detailed Metrics
                 </CardTitle>
-              </CardHeader>
-              <CardContent>
+              </CardHeader>              <CardContent>
                 <div className="overflow-x-auto">
                   <table className="w-full text-sm">
                     <thead>
