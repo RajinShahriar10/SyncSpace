@@ -98,9 +98,16 @@ export async function updateMemberRole(
   return response.data.data;
 }
 
+const JOIN_LINK_ROLES: Record<string, number> = {
+  Admin: 1,
+  Editor: 2,
+  Viewer: 3,
+};
+
 export async function generateJoinLink(workspaceId: string, role: string): Promise<string> {
+  const roleValue = JOIN_LINK_ROLES[role] ?? 2;
   const response = await api.post<{ data: string }>(
-    `/workspace/${workspaceId}/join-link?role=${encodeURIComponent(role)}`
+    `/workspace/${workspaceId}/join-link?role=${roleValue}`
   );
   return response.data.data;
 }
